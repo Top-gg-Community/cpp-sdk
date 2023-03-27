@@ -18,6 +18,7 @@ target_include_directories(topgg PUBLIC include)
 
 target_link_libraries(topgg PUBLIC
     ${CURL_LIBRARIES}
+    nlohmann_json::nlohmann_json
 )
 
 if (MSVC)
@@ -43,6 +44,7 @@ target_link_libraries(leaderboard PRIVATE
 )
 
 find_package(CURL REQUIRED)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 
 add_subdirectory(third_party/Catch2)
 
