@@ -1,5 +1,6 @@
-<<<<<<< HEAD
 # Top.gg SDK for C++
+
+The official open-source C++ wrapper for the Top.gg API.
 
 This is a simple C++ SDK for interacting with the [Top.gg API](https://docs.top.gg).
 
@@ -70,8 +71,3 @@ Refer to the [Top.gg API documentation](https://docs.top.gg) for information on 
 ## Contributing
 
 Pull requests are welcome! Please include unit tests for any added or modified functionality.
-=======
-# Top.gg C++ SDK
-
-The official open-source C++ wrapper for the Top.gg API
->>>>>>> upstream/main
