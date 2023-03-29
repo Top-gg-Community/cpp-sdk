@@ -74,3 +74,22 @@ BotStats Client::getStats()
         throw TopggAPIError("Failed to get stats: " + responseBody);
     }
 }
+
+void Client::updateStats(const BotStats& stats)
+{
+    nlohmann::json json;
+    json["server_count"] = stats.getServerCount();
+    json["shards"] = stats.getShardCount();
+    json["shard_ids"] = stats.getShardIds();
+
+    Request request(Request::Method::POST, m_baseUrl + "bots/" + m_botId + "/stats");
+    request.setHeader("Authorization", m_token);
+    request.setHeader("Content-Type", "application/json");
+    request.setBody(json.dump());
+
+    auto [statusCode, responseBody] = request.send();
+
+    if (statusCode != 200) {
+        throw TopggAPIError("Failed to update stats: " + responseBody);
+    }
+}
