@@ -28,7 +28,7 @@ public:
     void setQueryParameter(const std::string& key, const std::string& value);
     void setBody(const std::string& body);
 
-    std::pair<int, std::string> send();
+    std::pair<int, std::string> send() const;
 
 private:
     Method m_method;

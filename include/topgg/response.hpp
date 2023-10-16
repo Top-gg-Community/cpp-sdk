@@ -12,10 +12,10 @@ namespace http {
  */
 class Response {
 public:
-    Response(int statusCode, const std::string& body, const std::map<std::string, std::string>& headers);
+    Response(int statusCode, const std::string& body);
 
     int getStatusCode() const;
-    std::string getBody() const;
+    const std::string& getBody() const;
     std::string getHeader(const std::string& key) const;
 
 private:

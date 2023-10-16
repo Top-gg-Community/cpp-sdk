@@ -6,12 +6,12 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(topgg
-    src/http/client.cpp
+    src/client.cpp
     src/http/request.cpp
     src/http/response.cpp
-    include/topgg/http/client.hpp
-    include/topgg/http/request.hpp
-    include/topgg/http/response.hpp
+    include/topgg/client.hpp
+    include/topgg/request.hpp
+    include/topgg/response.hpp
 )
 
 target_include_directories(topgg PUBLIC include)
@@ -45,8 +45,6 @@ target_link_libraries(leaderboard PRIVATE
 
 find_package(CURL REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
-
-add_subdirectory(third_party/Catch2)
 
 # Uncomment if you want to run unit tests
 # enable_testing()
