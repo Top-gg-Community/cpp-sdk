@@ -1,7 +1,5 @@
-#include "topgg/http/request.hpp"
-
-#include <stdexcept>
-#include <memory>
+#include "topgg/request.hpp"
+#include <curl/curl.h>
 
 using namespace topgg::http;
 
@@ -35,7 +33,9 @@ std::pair<int, std::string> Request::send() const
 
     // Set request headers
     struct curl_slist* headerList = nullptr;
-    for (const auto& [name, value] : m_headers) {
+    for (const auto& header_it : m_headers) {
+        const std::string& name = header_it.first;
+        const std::string& value = header_it.second;
         const std::string header = name + ": " + value;
         headerList = curl_slist_append(headerList, header.c_str());
     }

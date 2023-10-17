@@ -1,4 +1,4 @@
-#include "topgg/http/response.hpp"
+#include "topgg/response.hpp"
 
 using namespace topgg::http;
 

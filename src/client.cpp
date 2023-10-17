@@ -1,9 +1,9 @@
 #include "topgg/client.hpp"
-#include "topgg/http/request.hpp"
-#include "topgg/http/response.hpp"
+#include "topgg/request.hpp"
+#include "topgg/response.hpp"
+#include <nlohmann/json.hpp>
 
 #include <sstream>
-#include <stdexcept>
 
 using namespace topgg;
 using namespace topgg::http;
@@ -27,7 +27,9 @@ std::vector<UserVote> Client::getVotes()
 {
     Request request(Request::Method::GET, "https://top.gg/api/bots/" + m_botId + "/votes");
     request.setHeader("Authorization", m_token);
-    auto [statusCode, responseBody] = request.send();
+    auto response = request.send();
+    auto statusCode = response.first;
+    auto responseBody = response.second;
 
     if (statusCode == 200) {
         std::vector<UserVote> votes;
@@ -58,7 +60,9 @@ BotStats Client::getStats()
 {
     Request request(Request::Method::GET, "https://top.gg/api/bots/" + m_botId + "/stats");
     request.setHeader("Authorization", m_token);
-    auto [statusCode, responseBody] = request.send();
+    auto response = request.send();
+    auto statusCode = response.first;
+    auto responseBody = response.second;
 
     if (statusCode == 200) {
         nlohmann::json json = nlohmann::json::parse(responseBody);
