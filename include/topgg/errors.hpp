@@ -6,23 +6,23 @@
 namespace topgg {
 
 class TopggAPIError : public std::exception {
-public:
-    TopggAPIError(const std::string& message);
-    const char* what() const noexcept override;
+ public:
+  TopggAPIError(const std::string& message);
+  const char* what() const noexcept override;
 
-private:
-    std::string m_message;
+ private:
+  std::string m_message;
 };
 
 class TopggAuthError : public std::exception {
-public:
-    TopggAuthError(const std::string& message);
-    const char* what() const noexcept override;
+ public:
+  TopggAuthError(const std::string& message);
+  const char* what() const noexcept override;
 
-private:
-    std::string m_message;
+ private:
+  std::string m_message;
 };
 
-} // namespace topgg
+}  // namespace topgg
 
-#endif // TOPGG_ERRORS_HPP
+#endif  // TOPGG_ERRORS_HPP
