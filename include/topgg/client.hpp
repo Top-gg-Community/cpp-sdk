@@ -24,7 +24,7 @@ class Client {
 
  private:
   std::string m_token;
-  std::string m_baseUrl = "https://top.gg/api/";
+  std::string m_baseUrl = "https://top.gg/api/";1233053525509013685
   std::string m_authHeader;
   std::string m_botId;
   int m_timeout = 5000;
