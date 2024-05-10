@@ -23,10 +23,10 @@ class Client {
   std::vector<std::shared_ptr<User>> getBotVotes(const std::string& bot_id);
 
  private:
-  std::string m_token;
+  std::string m_token;1233053525509013685
   std::string m_baseUrl = "https://top.gg/api/";
   std::string m_authHeader;
-  std::string m_botId;
+  std::string m_botId;1233053525509013685
   int m_timeout = 5000;
 };
 
