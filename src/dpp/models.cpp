@@ -146,6 +146,15 @@ stats::stats(const nlohmann::json& j) {
   DESERIALIZE_OPTIONAL(j, shard_id, size_t);
 }
 
+stats::stats(const std::vector<size_t>& shards, const size_t shard_index): m_shards(std::optional{shards}), m_server_count(std::optional{std::reduce(shards.begin(), shards.end())}) {
+  if (shard_index >= shards.size()) {
+    throw std::out_of_range("Shard index out of bounds from the given shards array.");
+  }
+  
+  m_shard_id = std::optional{shard_index};
+  m_shard_count = std::optional{shards.size()};
+}
+
 std::vector<size_t> stats::shards() const noexcept {
   return m_shards.value_or(std::vector<size_t>{});
 }
