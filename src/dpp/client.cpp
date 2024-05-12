@@ -29,9 +29,14 @@ void dpp_client::get_user(const dpp::snowflake& user_id, topgg::get_user_complet
 }
 
 void dpp_client::post_stats(const stats& s, topgg::post_stats_completion_t callback) {
+  auto headers = std::multimap<std::string, std::string>{m_headers};
+  const auto s_json = s.to_json();
+  
+  headers.insert(std::pair("Content-Length", std::to_string(s_json.size())));
+  
   m_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [callback](const auto& _) {
     callback();
-  }, s.to_json(), "application/json", m_headers);
+  }, s_json, "application/json", headers);
 }
 
 void dpp_client::get_stats(topgg::get_stats_completion_t callback) {
