@@ -49,7 +49,7 @@ namespace topgg {
     
   public:
     inline time_t created_at() const noexcept {
-      return static_cast<time_t>(((m_id >> 22) / 100) + 1420070400);
+      return static_cast<time_t>(((m_id >> 22) / 1000) + 1420070400);
     }
   };
   
