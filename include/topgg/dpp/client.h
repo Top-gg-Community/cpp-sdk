@@ -20,6 +20,8 @@ namespace topgg {
   TOPGG_API_CALLBACK(bool, has_voted);
   TOPGG_API_CALLBACK(bool, is_weekend);
   
+  typedef std::function<void(void)> post_stats_completion_t;
+  
   class dpp_client {
     dpp::cluster* m_cluster;
     std::multimap<std::string, std::string> m_headers;
@@ -31,6 +33,7 @@ namespace topgg {
     
     void get_bot(const dpp::snowflake& bot_id, get_bot_completion_t callback);
     void get_user(const dpp::snowflake& user_id, get_user_completion_t callback);
+    void post_stats(const stats& s, post_stats_completion_t callback);
     void get_stats(get_stats_completion_t callback);
     void get_voters(get_voters_completion_t callback);
     void has_voted(const dpp::snowflake& user_id, has_voted_completion_t callback);

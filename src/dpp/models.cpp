@@ -17,6 +17,11 @@ static void strptime(const char* s, const char* f, tm* t) {
 }
 #endif
 
+#define SERIALIZE_OPTIONAL(j, name) \
+  if (m_##name.has_value()) {       \
+    j[#name] = m_##name.value();    \
+  }
+
 #define DESERIALIZE(j, name, type) \
   m_##name = j[#name].template get<type>()
 
@@ -153,6 +158,17 @@ stats::stats(const std::vector<size_t>& shards, const size_t shard_index): m_sha
   
   m_shard_id = std::optional{shard_index};
   m_shard_count = std::optional{shards.size()};
+}
+
+std::string stats::to_json() const {
+  nlohmann::json j;
+  
+  SERIALIZE_OPTIONAL(j, shard_count);
+  SERIALIZE_OPTIONAL(j, server_count);
+  SERIALIZE_OPTIONAL(j, shards);
+  SERIALIZE_OPTIONAL(j, shard_id);
+  
+  return j.dump();
 }
 
 std::vector<size_t> stats::shards() const noexcept {

@@ -98,6 +98,8 @@ namespace topgg {
     std::optional<size_t> m_shard_id;
     std::optional<size_t> m_server_count;
   
+    std::string to_json() const;
+  
   public:
     inline stats(const size_t server_count): m_server_count(std::optional{server_count}) {}
     inline stats(const size_t server_count, const size_t shard_count): m_server_count(std::optional{shard_count}), m_shard_count(std::optional{shard_count}) {}

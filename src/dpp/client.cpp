@@ -28,6 +28,12 @@ void dpp_client::get_user(const dpp::snowflake& user_id, topgg::get_user_complet
   });
 }
 
+void dpp_client::post_stats(const stats& s, topgg::post_stats_completion_t callback) {
+  m_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [callback](const auto& _) {
+    callback();
+  }, s.to_json(), "application/json", m_headers);
+}
+
 void dpp_client::get_stats(topgg::get_stats_completion_t callback) {
   basic_request<topgg::stats>("/bots/stats", callback, [](const auto& j) {
     return topgg::stats{j};
