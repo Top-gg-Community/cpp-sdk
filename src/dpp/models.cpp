@@ -151,7 +151,7 @@ std::vector<size_t> stats::shards() const noexcept {
 }
 
 size_t stats::shard_count() const noexcept {
-  return m_shard_count.value_or(m_shards.value_or(std::vector<size_t>{}).size());
+  return m_shard_count.value_or(shards().size());
 }
 
 std::optional<size_t> stats::server_count() const noexcept {
