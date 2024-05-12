@@ -162,13 +162,7 @@ std::optional<size_t> stats::server_count() const noexcept {
       const auto& shards = m_shards.value();
 
       if (shards.size() > 0) {
-        size_t server_count = 0;
-
-        for (const auto& shard_server_count : shards) {
-          server_count += shard_server_count;
-        }
-
-        return std::optional{server_count};
+        return std::optional{std::reduce(shards.begin(), shards.end())};
       }
     });
 
