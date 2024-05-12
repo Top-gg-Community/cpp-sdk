@@ -147,30 +147,18 @@ stats::stats(const nlohmann::json& j) {
 }
 
 std::vector<size_t> stats::shards() const noexcept {
-  try {
-    return m_shards.value();
-  } catch (const std::exception& _) {
-    return std::vector<size_t>{};
-  }
+  return m_shards.value_or(std::vector<size_t>{});
 }
 
 size_t stats::shard_count() const noexcept {
-  try {
-    return m_shard_count.value();
-  } catch (const std::exception& _) {
-    try {
-      return m_shards.value().size();
-    } catch (const std::exception& __) {
-      return 0;
-    }
-  }
+  return m_shard_count.value_or(m_shards.value_or(std::vector<size_t>{}).size());
 }
 
 std::optional<size_t> stats::server_count() const noexcept {
   if (m_server_count.has_value()) {
     return m_server_count;
   } else {
-    try {
+    IGNORE_EXCEPTION({
       const auto& shards = m_shards.value();
 
       if (shards.size() > 0) {
@@ -182,8 +170,7 @@ std::optional<size_t> stats::server_count() const noexcept {
 
         return std::optional{server_count};
       }
-    } catch (const std::exception& _) {
-    }
+    });
 
     return std::nullopt;
   }
