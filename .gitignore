@@ -1,0 +1,9 @@
+**/*.exe
+**/*.dll
+**/*.lib
+**/*.obj
+**/*.pdb
+**/*.cmd
+
+include/dpp/
+include/nlohmann/
