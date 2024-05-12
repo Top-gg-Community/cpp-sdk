@@ -6,6 +6,7 @@
 
 #include <topgg/dpp.h>
 
+#include <string_view>
 #include <optional>
 #include <string>
 #include <vector>
@@ -45,7 +46,7 @@ namespace topgg {
     
     TOPGG_MODEL_PROPERTY_REF_VIS(protected, dpp::snowflake, id)
     TOPGG_MODEL_PROPERTY_REF(std::string, avatar)
-    TOPGG_MODEL_PROPERTY_REF(std::string, username)
+    TOPGG_MODEL_PROPERTY_REF(std::string_view, username)
     
   public:
     inline time_t created_at() const noexcept {
@@ -66,16 +67,16 @@ namespace topgg {
     
     bot(const nlohmann::json& j);
     
-    TOPGG_MODEL_PROPERTY_REF(std::string, discriminator)
-    TOPGG_MODEL_PROPERTY_REF(std::string, prefix)
-    TOPGG_MODEL_PROPERTY_REF(std::string, short_description)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, long_description)
-    TOPGG_MODEL_PROPERTY_REF(std::vector<std::string>, tags)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, website)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, github)
+    TOPGG_MODEL_PROPERTY_REF(std::string_view, discriminator)
+    TOPGG_MODEL_PROPERTY_REF(std::string_view, prefix)
+    TOPGG_MODEL_PROPERTY_REF(std::string_view, short_description)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, long_description)
+    TOPGG_MODEL_PROPERTY_REF(std::vector<std::string_view>, tags)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, website)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, github)
     TOPGG_MODEL_PROPERTY_REF(std::vector<dpp::snowflake>, owners)
     TOPGG_MODEL_PROPERTY_REF(std::vector<size_t>, guilds)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, banner)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, banner)
     TOPGG_MODEL_PROPERTY(time_t, approved_at)
     TOPGG_MODEL_PROPERTY(bool, is_certified)
     TOPGG_MODEL_PROPERTY_REF(std::vector<size_t>, shards)
@@ -113,11 +114,11 @@ namespace topgg {
     
     socials(const nlohmann::json& j);
     
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, github)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, instagram)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, reddit)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, twitter)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, youtube)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, github)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, instagram)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, reddit)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, twitter)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, youtube)
   };
   
   class user: public account {
@@ -125,8 +126,8 @@ namespace topgg {
     
     user(const nlohmann::json& j);
     
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, bio)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, banner)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, bio)
+    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, banner)
     TOPGG_MODEL_PROPERTY_REF(std::optional<socials>, socials)
     TOPGG_MODEL_PROPERTY(bool, is_supporter)
     TOPGG_MODEL_PROPERTY(bool, is_certified_dev)

@@ -10,10 +10,10 @@ using topgg::bot;
 #include <sstream>
 #include <iomanip>
 
-static void strptime(const char* s, const char* f, struct tm* tm) {
-  std::istringstream input(s);
-  input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
-  input >> std::get_time(tm, f);
+static void strptime(const char* s, const char* f, tm* t) {
+  std::istringstream input{s};
+  input.imbue(std::locale{setlocale(LC_ALL, nullptr)});
+  input >> std::get_time(t, f);
 }
 #endif
 
@@ -46,28 +46,28 @@ static void strptime(const char* s, const char* f, struct tm* tm) {
     m_##prop = j[#name].template get<type>();     \
   })
 
-#define DESERIALIZE_OPTIONAL_STRING(j, name)                 \
-  IGNORE_EXCEPTION({                                         \
-    const auto value = j[#name].template get<std::string>(); \
-                                                             \
-    if (value.size() > 0) {                                  \
-      m_##name = std::optional{value};                       \
-    }                                                        \
+#define DESERIALIZE_OPTIONAL_STRING(j, name)                      \
+  IGNORE_EXCEPTION({                                              \
+    const auto value = j[#name].template get<std::string_view>(); \
+                                                                  \
+    if (value.size() > 0) {                                       \
+      m_##name = std::optional{value};                            \
+    }                                                             \
   })
 
-#define DESERIALIZE_OPTIONAL_STRING_ALIAS(j, name, prop)     \
-  IGNORE_EXCEPTION({                                         \
-    const auto value = j[#name].template get<std::string>(); \
-                                                             \
-    if (value.size() > 0) {                                  \
-      m_##prop = std::optional{value};                       \
-    }                                                        \
+#define DESERIALIZE_OPTIONAL_STRING_ALIAS(j, name, prop)          \
+  IGNORE_EXCEPTION({                                              \
+    const auto value = j[#name].template get<std::string_view>(); \
+                                                                  \
+    if (value.size() > 0) {                                       \
+      m_##prop = std::optional{value};                            \
+    }                                                             \
   })
 
 account::account(const nlohmann::json& j) {
-  m_id = dpp::snowflake{j["id"].template get<std::string>()};
+  m_id = dpp::snowflake{j["id"].template get<std::string_view>()};
   
-  DESERIALIZE(j, username, std::string);
+  DESERIALIZE(j, username, std::string_view);
   
   try {
     const auto hash = j["avatar"].template get<std::string>();
@@ -80,16 +80,16 @@ account::account(const nlohmann::json& j) {
 }
 
 bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
-  DESERIALIZE(j, discriminator, std::string);
-  DESERIALIZE(j, prefix, std::string);
-  DESERIALIZE_ALIAS(j, shortdesc, short_description, std::string);
+  DESERIALIZE(j, discriminator, std::string_view);
+  DESERIALIZE(j, prefix, std::string_view);
+  DESERIALIZE_ALIAS(j, shortdesc, short_description, std::string_view);
   DESERIALIZE_OPTIONAL_STRING_ALIAS(j, longdesc, long_description);
-  DESERIALIZE_VECTOR(j, tags, std::string);
+  DESERIALIZE_VECTOR(j, tags, std::string_view);
   DESERIALIZE_OPTIONAL_STRING(j, website);
   DESERIALIZE_OPTIONAL_STRING(j, github);
   
   IGNORE_EXCEPTION({
-    const auto owners = j["owners"].template get<std::vector<std::string>>();
+    const auto owners = j["owners"].template get<std::vector<std::string_view>>();
     
     m_owners.reserve(owners.size());
     
@@ -101,10 +101,10 @@ bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
   DESERIALIZE_VECTOR(j, guilds, size_t);
   DESERIALIZE_OPTIONAL_STRING_ALIAS(j, bannerUrl, banner);
 
-  const auto approved_at = j["date"].template get<std::string>();
-  struct tm approved_at_tm;
+  const auto approved_at = j["date"].template get<std::string_view>();
+  tm approved_at_tm;
   
-  strptime(approved_at.c_str(), "%Y-%m-%dT%H:%M:%S", &approved_at_tm);
+  strptime(approved_at.data(), "%Y-%m-%dT%H:%M:%S", &approved_at_tm);
   m_approved_at = mktime(&approved_at_tm);
   
   DESERIALIZE_ALIAS(j, certifiedBot, is_certified, bool);
@@ -133,7 +133,7 @@ bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
   }
   
   try {
-    m_url.append(j["vanity"].template get<std::string>());
+    m_url.append(j["vanity"].template get<std::string_view>());
   } catch (const std::exception& _) {
     m_url.append(std::to_string(m_id));
   }
