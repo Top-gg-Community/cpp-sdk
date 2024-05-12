@@ -39,7 +39,7 @@ void dpp_client::get_voters(topgg::get_voters_completion_t callback) {
     std::vector<topgg::voter> voters;
     
     for (const auto& part: j) {
-      voters.push_back(topgg::voter{j});
+      voters.push_back(topgg::voter{part});
     }
     
     return voters;

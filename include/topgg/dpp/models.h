@@ -98,6 +98,9 @@ namespace topgg {
     std::optional<size_t> m_server_count;
   
   public:
+    inline stats(const size_t server_count): m_server_count(std::optional{server_count}) {}
+    inline stats(const size_t server_count, const size_t shard_count): m_server_count(std::optional{shard_count}), m_shard_count(std::optional{shard_count}) {}
+    
     std::vector<size_t> shards() const noexcept;
     size_t shard_count() const noexcept;
     std::optional<size_t> server_count() const noexcept;
