@@ -21,9 +21,11 @@ namespace topgg {
 template <typename T>
 class result;
 
-TOPGG_ERROR_CLASS(internal_server_error, std::runtime_error,
+TOPGG_ERROR_CLASS(internal_server_error,
+                  std::runtime_error,
                   "Received an unexpected error from Top.gg's end.");
-TOPGG_ERROR_CLASS(invalid_token, std::invalid_argument,
+TOPGG_ERROR_CLASS(invalid_token,
+                  std::invalid_argument,
                   "Invalid Top.gg API token.");
 TOPGG_ERROR_CLASS(not_found, std::runtime_error, "Such query does not exist.");
 

@@ -25,7 +25,9 @@ namespace topgg {
   type m_##name;                                         \
                                                          \
  public:                                                 \
-  inline constexpr type name() const noexcept { return m_##name; }
+  inline constexpr type name() const noexcept {          \
+    return m_##name;                                     \
+  }
 
 #define TOPGG_MODEL_PROPERTY(type, name) \
   TOPGG_MODEL_PROPERTY_VIS(private, type, name)
@@ -35,7 +37,9 @@ namespace topgg {
   type m_##name;                                             \
                                                              \
  public:                                                     \
-  inline type const& name() const noexcept { return m_##name; }
+  inline type const& name() const noexcept {                 \
+    return m_##name;                                         \
+  }
 
 #define TOPGG_MODEL_PROPERTY_REF(type, name) \
   TOPGG_MODEL_PROPERTY_REF_VIS(private, type, name)
