@@ -23,33 +23,36 @@ static void strptime(const char* s, const char* f, struct tm* tm) {
 #define DESERIALIZE_ALIAS(j, name, prop, type) \
   m_##prop = j[#name].template get<type>()
 
+#define IGNORE_EXCEPTION(scope) \
+  try scope catch (const std::exception& _) {}
+
 #define DESERIALIZE_VECTOR(j, name, type)                  \
-  try {                                                    \
+  IGNORE_EXCEPTION({                                       \
     m_##name = j[#name].template get<std::vector<type>>(); \
-  } catch (const std::exception& _) {}
+  })
 
 #define DESERIALIZE_VECTOR_ALIAS(j, name, prop, type)      \
-  try {                                                    \
+  IGNORE_EXCEPTION({                                       \
     m_##prop = j[#name].template get<std::vector<type>>(); \
-  } catch (const std::exception& _) {}
+  })
 
 #define DESERIALIZE_OPTIONAL_STRING(j, name)                 \
-  try {                                                      \
+  IGNORE_EXCEPTION({                                         \
     const auto value = j[#name].template get<std::string>(); \
                                                              \
     if (value.size() > 0) {                                  \
       m_##name = std::optional{value};                       \
     }                                                        \
-  } catch (const std::exception& _) {}
+  })
 
 #define DESERIALIZE_OPTIONAL_STRING_ALIAS(j, name, prop)     \
-  try {                                                      \
+  IGNORE_EXCEPTION({                                         \
     const auto value = j[#name].template get<std::string>(); \
                                                              \
     if (value.size() > 0) {                                  \
       m_##prop = std::optional{value};                       \
     }                                                        \
-  } catch (const std::exception& _) {}
+  })
 
 account::account(const nlohmann::json& j) {
   m_id = dpp::snowflake{j["id"].template get<std::string>()};
@@ -75,7 +78,7 @@ bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
   DESERIALIZE_OPTIONAL_STRING(j, website);
   DESERIALIZE_OPTIONAL_STRING(j, github);
   
-  try {
+  IGNORE_EXCEPTION({
     const auto owners = j["owners"].template get<std::vector<std::string>>();
     
     m_owners.reserve(owners.size());
@@ -83,7 +86,7 @@ bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
     for (const auto& owner: owners) {
       m_owners.push_back(dpp::snowflake{owner});
     }
-  } catch (const std::exception& _) {}
+  });
   
   DESERIALIZE_VECTOR(j, guilds, size_t);
   DESERIALIZE_OPTIONAL_STRING_ALIAS(j, bannerUrl, banner);
@@ -105,13 +108,13 @@ bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
     m_invite = "https://discord.com/oauth2/authorize?scope=bot&client_id=" + std::to_string(m_id);
   }
   
-  try {
+  IGNORE_EXCEPTION({
     const auto support = j["support"].template get<std::string>();
     
     if (support.size() > 0) {
       m_support = std::optional{"https://discord.com/invite/" + support};
     }
-  } catch (const std::exception& _) {}
+  });
   
   try {
     DESERIALIZE(j, shard_count, size_t);

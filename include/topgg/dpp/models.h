@@ -100,7 +100,6 @@ namespace topgg {
   class user;
 
   class socials {
-    friend class dpp_client;
     friend class user;
     
     socials(const nlohmann::json& j);
