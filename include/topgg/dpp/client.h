@@ -22,14 +22,14 @@ namespace topgg {
   
   using post_stats_completion_t = std::function<void(void)>;
   
-  class dpp_client {
+  class client {
     dpp::cluster* m_cluster;
     std::multimap<std::string, std::string> m_headers;
     
     template<typename T>
     void basic_request(const std::string& url, std::function<void(const result<T>&)> callback, std::function<T(const nlohmann::json&)> conversion_fn);
   public:
-    dpp_client(dpp::cluster* cluster, const std::string& token);
+    client(dpp::cluster* cluster, const std::string& token);
     
     void get_bot(const dpp::snowflake& bot_id, get_bot_completion_t callback);
     void get_user(const dpp::snowflake& user_id, get_user_completion_t callback);

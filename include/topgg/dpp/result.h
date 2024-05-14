@@ -53,7 +53,7 @@ namespace topgg {
     friend class result;
   };
   
-  class dpp_client;
+  class client;
   
   template<typename T>
   class result {
@@ -64,7 +64,7 @@ namespace topgg {
   public:
     T get() const;
   
-    friend class dpp_client;
+    friend class client;
   };
 };
 

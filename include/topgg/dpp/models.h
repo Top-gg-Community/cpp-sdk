@@ -54,16 +54,16 @@ namespace topgg {
     }
   };
   
-  class dpp_client;
+  class client;
   
   class voter: public account {
-    friend class dpp_client;
+    friend class client;
     
     inline voter(const nlohmann::json& j): account(j) {}
   };
 
   class bot: public account {
-    friend class dpp_client;
+    friend class client;
     
     bot(const nlohmann::json& j);
     
@@ -89,7 +89,7 @@ namespace topgg {
   };
   
   class stats {
-    friend class dpp_client;
+    friend class client;
   
     stats(const nlohmann::json& j);
   
@@ -130,7 +130,7 @@ namespace topgg {
   };
   
   class user: public account {
-    friend class dpp_client;
+    friend class client;
     
     user(const nlohmann::json& j);
     
