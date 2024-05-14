@@ -10,31 +10,31 @@ using topgg::stats;
 
 #if __cplusplus < 202002L
 void semaphore::release() {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<std::mutex> lock{m_mutex};
   ++m_count;
   m_condition.notify_one();
 }
 
 void semaphore::acquire() {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<std::mutex> lock{m_mutex};
   
   while (!m_count) {
     m_condition.wait(lock);
   }
   
-  --m_count;
+  m_count = 0;
 }
 #endif
 
 void killable_waiter::kill() {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<std::mutex> lock{m_mutex};
   m_killed = true;
   m_condition.notify_one();
 }
 
 template<class R, class P>
 bool killable_waiter::wait(const std::chrono::duration<R, P>& delay) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<std::mutex> lock{m_mutex};
   
   m_condition.wait_for(lock, delay, [this]() -> bool { return this->m_killed; });
   
