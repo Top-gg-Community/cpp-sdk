@@ -109,6 +109,10 @@ namespace topgg {
     std::vector<size_t> shards() const noexcept;
     size_t shard_count() const noexcept;
     std::optional<size_t> server_count() const noexcept;
+    
+    inline void set_server_count(const size_t new_server_count) noexcept {
+      m_server_count = std::optional{new_server_count};
+    }
   };
   
   class user;
