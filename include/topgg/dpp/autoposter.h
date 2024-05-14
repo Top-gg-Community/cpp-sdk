@@ -60,7 +60,7 @@ namespace topgg {
       std::thread m_thread;
       
       virtual inline void thread_prepare() {}
-      virtual ::topgg::stats thread_get() = 0;
+      virtual ::topgg::stats thread_get(dpp::cluster* bot) = 0;
       
     protected:
       std::shared_ptr<dpp::cluster> m_cluster;
@@ -82,7 +82,7 @@ namespace topgg {
         m_semaphore.acquire();
       }
       
-      inline ::topgg::stats thread_get() override {
+      inline ::topgg::stats thread_get(dpp::cluster* _) override {
         return ::topgg::stats{m_guilds.size()};
       }
       
@@ -94,15 +94,15 @@ namespace topgg {
     };
     
     class callback: public base {
-      std::function<::topgg::stats()> m_callback;
+      std::function<::topgg::stats(dpp::cluster*)> m_callback;
       
-      inline ::topgg::stats thread_get() override {
-        return m_callback();
+      inline ::topgg::stats thread_get(dpp::cluster* bot) override {
+        return m_callback(bot);
       }
       
     public:
       template<class R, class P>
-      inline callback(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay, std::function<::topgg::stats()> callback): base(cluster, token, delay), m_callback(callback) {}
+      inline callback(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay, std::function<::topgg::stats(dpp::cluster*)> callback): base(cluster, token, delay), m_callback(callback) {}
     };
   };
 };

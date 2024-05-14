@@ -100,12 +100,14 @@ int main() {
 #include <dpp/dpp.h>
 #include <iostream>
 
+topgg::stats fetch_stats(dpp::cluster* bot) {
+  // fetch server count here...
+}
+
 int main() {
   std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
   
-  topgg::autoposter::callback autoposter{bot, "your top.gg token", std::chrono::minutes(15), []() -> topgg::stats {
-    // fetch server count here...
-  }};
+  topgg::autoposter::callback autoposter{bot, "your top.gg token", std::chrono::minutes(15), fetch_stats};
 
   // your bot's code...
 

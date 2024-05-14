@@ -50,7 +50,7 @@ base::base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, con
       this->thread_prepare();
       this->m_mutex.lock();
 
-      const auto s = this->thread_get();
+      const auto s = this->thread_get(thread_cluster.get());
       
       this->m_mutex.unlock();
       
