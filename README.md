@@ -82,7 +82,6 @@ If you want for the SDK to automatically retrieve server count itself by listeni
 ```cpp
 #include <topgg/dpp.h>
 #include <dpp/dpp.h>
-#include <iostream>
 
 int main() {
   std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
@@ -102,7 +101,6 @@ If you want to use your own function (e.g: retrieve the server count on your own
 ```cpp
 #include <topgg/dpp.h>
 #include <dpp/dpp.h>
-#include <iostream>
 
 static topgg::stats fetch_stats(dpp::cluster* bot) {
   // fetch server count here...
