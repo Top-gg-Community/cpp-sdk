@@ -63,10 +63,10 @@ namespace topgg {
       virtual ::topgg::stats thread_get() = 0;
       
     protected:
+      std::shared_ptr<dpp::cluster> m_cluster;
+      
       template<class R, class P>
       base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay);
-      
-      std::shared_ptr<dpp::cluster> m_cluster;
     public:
       virtual void request_stop();
       
