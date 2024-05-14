@@ -52,7 +52,7 @@ int main() {
 
 ### Checking if a user has voted your bot
 
-```rust,no_run
+```cpp
 #include <topgg/dpp.h>
 #include <dpp/dpp.h>
 #include <iostream>
@@ -70,6 +70,43 @@ int main() {
       std::cout << "error: " << ext.what() << std::endl;
     }
   });
+
+  return 0;
+}
+```
+
+### Cached autoposting
+
+```cpp
+#include <topgg/dpp.h>
+#include <dpp/dpp.h>
+#include <iostream>
+
+int main() {
+  dpp::cluster bot("your bot token");
+  topgg::autoposter::cached autoposter(&bot, "your top.gg token", std::chrono::minutes(15));
+
+  // your bot's code...
+
+  return 0;
+}
+```
+
+### Stats-fed autoposting
+
+```cpp
+#include <topgg/dpp.h>
+#include <dpp/dpp.h>
+#include <iostream>
+
+int main() {
+  std::shared_ptr<dpp::cluster> bot(new dpp::cluster("your bot token"));
+  
+  topgg::autoposter::callback autoposter(bot, "your top.gg token", std::chrono::minutes(15), []() -> topgg::stats {
+    // fetch server count here...
+  });
+
+  // your bot's code...
 
   return 0;
 }
