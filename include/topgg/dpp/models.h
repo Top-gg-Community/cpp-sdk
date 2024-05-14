@@ -88,8 +88,13 @@ namespace topgg {
     TOPGG_MODEL_PROPERTY_REF(std::string, url)
   };
   
+  namespace autoposter {
+    class base;
+  };
+  
   class stats {
     friend class client;
+    friend class autoposter::base;
   
     stats(const nlohmann::json& j);
   
