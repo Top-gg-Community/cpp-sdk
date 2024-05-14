@@ -4,7 +4,7 @@ The official C++ SDK for the [Top.gg API](https://docs.top.gg).
 
 ## D++ examples
 
-## Fetching a user from its Discord ID
+### Fetching a user from its Discord ID
 
 ```cpp
 #include <topgg/dpp.h>
@@ -29,7 +29,7 @@ int main() {
 }
 ```
 
-### Posting your bot's statistics
+#### Posting your bot's statistics
 
 ```cpp
 #include <topgg/dpp.h>
@@ -50,7 +50,7 @@ int main() {
 }
 ```
 
-### Checking if a user has voted your bot
+#### Checking if a user has voted your bot
 
 ```cpp
 #include <topgg/dpp.h>
@@ -75,7 +75,7 @@ int main() {
 }
 ```
 
-### Cached autoposting
+#### Cached autoposting
 
 ```cpp
 #include <topgg/dpp.h>
@@ -93,7 +93,7 @@ int main() {
 }
 ```
 
-### Stats-fed autoposting
+#### Stats-fed autoposting
 
 ```cpp
 #include <topgg/dpp.h>
