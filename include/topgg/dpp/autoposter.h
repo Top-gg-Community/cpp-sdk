@@ -59,7 +59,8 @@ namespace topgg {
       killable_waiter m_waiter;
       std::thread m_thread;
       
-      virtual inline void thread_prepare() {}
+      virtual inline void before_fetch() {}
+      virtual inline void after_fetch() {}
       virtual ::topgg::stats get_stats(dpp::cluster* bot) = 0;
       
     protected:
@@ -78,8 +79,13 @@ namespace topgg {
       semaphore m_semaphore;
       std::set<dpp::snowflake> m_guilds;
       
-      inline void thread_prepare() override {
+      inline void before_fetch() override {
         m_semaphore.acquire();
+        m_mutex.lock();
+      }
+      
+      inline void after_fetch() override {
+        m_mutex.unlock();
       }
       
       inline ::topgg::stats get_stats(dpp::cluster* _) override {

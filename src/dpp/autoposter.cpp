@@ -46,12 +46,11 @@ base::base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, con
     std::shared_ptr<dpp::cluster> thread_cluster{this->m_cluster};
 
     while (this->m_waiter.wait(delay)) {
-      this->thread_prepare();
-      this->m_mutex.lock();
+      this->before_fetch();
 
       const auto s = this->get_stats(thread_cluster.get());
       
-      this->m_mutex.unlock();
+      this->after_fetch();
       
       const auto s_json = s.to_json();
       const std::multimap<std::string, std::string> headers = {
