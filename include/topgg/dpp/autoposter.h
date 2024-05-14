@@ -37,6 +37,8 @@ namespace topgg {
 #else
     typedef std::binary_semaphore semaphore;
 #endif
+    
+    class base;
 
     // such a menacing name
     class killable_waiter {
@@ -48,10 +50,9 @@ namespace topgg {
       
       template<class R, class P>
       bool wait(const std::chrono::duration<R, P>& delay);
-      
-      friend class cached;
-    public:
       void kill();
+      
+      friend class base;
     };
     
     class base {
