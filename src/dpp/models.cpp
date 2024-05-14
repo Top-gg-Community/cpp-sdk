@@ -17,38 +17,43 @@ static void strptime(const char* s, const char* f, tm* t) {
 }
 #endif
 
-#define SERIALIZE_OPTIONAL(j, name) \
-  if (m_##name.has_value()) {       \
-    j[#name] = m_##name.value();    \
+#define SERIALIZE_PRIVATE_OPTIONAL(j, name) \
+  if (m_##name.has_value()) {               \
+    j[#name] = m_##name.value();            \
   }
 
 #define DESERIALIZE(j, name, type) \
-  m_##name = j[#name].template get<type>()
+  name = j[#name].template get<type>()
 
 #define DESERIALIZE_ALIAS(j, name, prop, type) \
-  m_##prop = j[#name].template get<type>()
+  prop = j[#name].template get<type>()
 
 #define IGNORE_EXCEPTION(scope) \
   try scope catch (const std::exception& _) {}
 
 #define DESERIALIZE_VECTOR(j, name, type)                  \
   IGNORE_EXCEPTION({                                       \
-    m_##name = j[#name].template get<std::vector<type>>(); \
+    name = j[#name].template get<std::vector<type>>();     \
   })
 
 #define DESERIALIZE_VECTOR_ALIAS(j, name, prop, type)      \
   IGNORE_EXCEPTION({                                       \
-    m_##prop = j[#name].template get<std::vector<type>>(); \
+    prop = j[#name].template get<std::vector<type>>();     \
   })
 
 #define DESERIALIZE_OPTIONAL(j, name, type)   \
   IGNORE_EXCEPTION({                          \
-    m_##name = j[#name].template get<type>(); \
+    name = j[#name].template get<type>();     \
+  })
+
+#define DESERIALIZE_PRIVATE_OPTIONAL(j, name, type)   \
+  IGNORE_EXCEPTION({                                  \
+    m_##name = j[#name].template get<type>();         \
   })
 
 #define DESERIALIZE_OPTIONAL_ALIAS(j, name, prop) \
   IGNORE_EXCEPTION({                              \
-    m_##prop = j[#name].template get<type>();     \
+    prop = j[#name].template get<type>();         \
   })
 
 #define DESERIALIZE_OPTIONAL_STRING(j, name)                      \
@@ -56,7 +61,7 @@ static void strptime(const char* s, const char* f, tm* t) {
     const auto value = j[#name].template get<std::string_view>(); \
                                                                   \
     if (value.size() > 0) {                                       \
-      m_##name = std::optional{value};                            \
+      name = std::optional{value};                                \
     }                                                             \
   })
 
@@ -65,12 +70,12 @@ static void strptime(const char* s, const char* f, tm* t) {
     const auto value = j[#name].template get<std::string_view>(); \
                                                                   \
     if (value.size() > 0) {                                       \
-      m_##prop = std::optional{value};                            \
+      prop = std::optional{value};                                \
     }                                                             \
   })
 
 account::account(const nlohmann::json& j) {
-  m_id = dpp::snowflake{j["id"].template get<std::string_view>()};
+  id = dpp::snowflake{j["id"].template get<std::string_view>()};
   
   DESERIALIZE(j, username, std::string_view);
   
@@ -78,13 +83,15 @@ account::account(const nlohmann::json& j) {
     const auto hash = j["avatar"].template get<std::string>();
     const char* ext = hash.rfind("a_", 0) == 0 ? "gif" : "png";
 
-    m_avatar = "https://cdn.discordapp.com/avatars/" + std::to_string(m_id) + "/" + hash + "." + ext + "?size=1024";
+    avatar = "https://cdn.discordapp.com/avatars/" + std::to_string(id) + "/" + hash + "." + ext + "?size=1024";
   } catch (const std::exception& _) {
-    m_avatar = "https://cdn.discordapp.com/embed/avatars/" + std::to_string((m_id >> 22) % 5) + ".png";
+    avatar = "https://cdn.discordapp.com/embed/avatars/" + std::to_string((id >> 22) % 5) + ".png";
   }
+  
+  created_at = static_cast<time_t>(((id >> 22) / 1000) + 1420070400);
 }
 
-bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
+bot::bot(const nlohmann::json& j): account(j), url("https://top.gg/bot/") {
   DESERIALIZE(j, discriminator, std::string_view);
   DESERIALIZE(j, prefix, std::string_view);
   DESERIALIZE_ALIAS(j, shortdesc, short_description, std::string_view);
@@ -94,23 +101,23 @@ bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
   DESERIALIZE_OPTIONAL_STRING(j, github);
   
   IGNORE_EXCEPTION({
-    const auto owners = j["owners"].template get<std::vector<std::string_view>>();
+    const auto j_owners = j["owners"].template get<std::vector<std::string_view>>();
     
-    m_owners.reserve(owners.size());
+    owners.reserve(j_owners.size());
     
-    for (const auto& owner: owners) {
-      m_owners.push_back(dpp::snowflake{owner});
+    for (const auto& owner: j_owners) {
+      owners.push_back(dpp::snowflake{owner});
     }
   });
   
   DESERIALIZE_VECTOR(j, guilds, size_t);
   DESERIALIZE_OPTIONAL_STRING_ALIAS(j, bannerUrl, banner);
 
-  const auto approved_at = j["date"].template get<std::string_view>();
+  const auto j_approved_at = j["date"].template get<std::string_view>();
   tm approved_at_tm;
   
-  strptime(approved_at.data(), "%Y-%m-%dT%H:%M:%S", &approved_at_tm);
-  m_approved_at = mktime(&approved_at_tm);
+  strptime(j_approved_at.data(), "%Y-%m-%dT%H:%M:%S", &approved_at_tm);
+  approved_at = mktime(&approved_at_tm);
   
   DESERIALIZE_ALIAS(j, certifiedBot, is_certified, bool);
   DESERIALIZE_VECTOR(j, shards, size_t);
@@ -120,35 +127,35 @@ bot::bot(const nlohmann::json& j): account(j), m_url("https://top.gg/bot/") {
   try {
     DESERIALIZE(j, invite, std::string);
   } catch (const std::exception& _) {
-    m_invite = "https://discord.com/oauth2/authorize?scope=bot&client_id=" + std::to_string(m_id);
+    invite = "https://discord.com/oauth2/authorize?scope=bot&client_id=" + std::to_string(id);
   }
   
   IGNORE_EXCEPTION({
-    const auto support = j["support"].template get<std::string>();
+    const auto j_support = j["support"].template get<std::string>();
     
-    if (support.size() > 0) {
-      m_support = std::optional{"https://discord.com/invite/" + support};
+    if (j_support.size() > 0) {
+      support = std::optional{"https://discord.com/invite/" + j_support};
     }
   });
   
   try {
     DESERIALIZE(j, shard_count, size_t);
   } catch (const std::exception& _) {
-    m_shard_count = m_shards.size();
+    shard_count = shards.size();
   }
   
   try {
-    m_url.append(j["vanity"].template get<std::string_view>());
+    url.append(j["vanity"].template get<std::string_view>());
   } catch (const std::exception& _) {
-    m_url.append(std::to_string(m_id));
+    url.append(std::to_string(id));
   }
 }
 
 stats::stats(const nlohmann::json& j) {
-  DESERIALIZE_OPTIONAL(j, shard_count, size_t);
-  DESERIALIZE_OPTIONAL(j, server_count, size_t);
-  DESERIALIZE_OPTIONAL(j, shards, std::vector<size_t>);
-  DESERIALIZE_OPTIONAL(j, shard_id, size_t);
+  DESERIALIZE_PRIVATE_OPTIONAL(j, shard_count, size_t);
+  DESERIALIZE_PRIVATE_OPTIONAL(j, server_count, size_t);
+  DESERIALIZE_PRIVATE_OPTIONAL(j, shards, std::vector<size_t>);
+  DESERIALIZE_PRIVATE_OPTIONAL(j, shard_id, size_t);
 }
 
 stats::stats(const std::vector<size_t>& shards, const size_t shard_index): m_shards(std::optional{shards}), m_server_count(std::optional{std::reduce(shards.begin(), shards.end())}) {
@@ -163,10 +170,10 @@ stats::stats(const std::vector<size_t>& shards, const size_t shard_index): m_sha
 std::string stats::to_json() const {
   nlohmann::json j;
   
-  SERIALIZE_OPTIONAL(j, shard_count);
-  SERIALIZE_OPTIONAL(j, server_count);
-  SERIALIZE_OPTIONAL(j, shards);
-  SERIALIZE_OPTIONAL(j, shard_id);
+  SERIALIZE_PRIVATE_OPTIONAL(j, shard_count);
+  SERIALIZE_PRIVATE_OPTIONAL(j, server_count);
+  SERIALIZE_PRIVATE_OPTIONAL(j, shards);
+  SERIALIZE_PRIVATE_OPTIONAL(j, shard_id);
   
   return j.dump();
 }
@@ -208,7 +215,7 @@ user::user(const nlohmann::json& j): account(j) {
   DESERIALIZE_OPTIONAL_STRING(j, banner);
   
   if (j.contains("contains")) {
-    m_socials = std::optional{topgg::socials::socials{j["socials"].template get<nlohmann::json>()}};
+    socials = std::optional{topgg::socials::socials{j["socials"].template get<nlohmann::json>()}};
   }
   
   DESERIALIZE_ALIAS(j, supporter, is_supporter, bool);

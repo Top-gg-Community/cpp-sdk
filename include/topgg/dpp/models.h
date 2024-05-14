@@ -43,15 +43,12 @@ namespace topgg {
   class account {
   protected:
     account(const nlohmann::json& j);
-    
-    TOPGG_MODEL_PROPERTY_REF_VIS(protected, dpp::snowflake, id)
-    TOPGG_MODEL_PROPERTY_REF(std::string, avatar)
-    TOPGG_MODEL_PROPERTY_REF(std::string_view, username)
-    
+
   public:
-    inline time_t created_at() const noexcept {
-      return static_cast<time_t>(((m_id >> 22) / 1000) + 1420070400);
-    }
+    dpp::snowflake id;
+    std::string avatar;
+    std::string_view username;
+    time_t created_at;
   };
   
   class client;
@@ -67,25 +64,26 @@ namespace topgg {
     
     bot(const nlohmann::json& j);
     
-    TOPGG_MODEL_PROPERTY_REF(std::string_view, discriminator)
-    TOPGG_MODEL_PROPERTY_REF(std::string_view, prefix)
-    TOPGG_MODEL_PROPERTY_REF(std::string_view, short_description)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, long_description)
-    TOPGG_MODEL_PROPERTY_REF(std::vector<std::string_view>, tags)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, website)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, github)
-    TOPGG_MODEL_PROPERTY_REF(std::vector<dpp::snowflake>, owners)
-    TOPGG_MODEL_PROPERTY_REF(std::vector<size_t>, guilds)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, banner)
-    TOPGG_MODEL_PROPERTY(time_t, approved_at)
-    TOPGG_MODEL_PROPERTY(bool, is_certified)
-    TOPGG_MODEL_PROPERTY_REF(std::vector<size_t>, shards)
-    TOPGG_MODEL_PROPERTY(size_t, votes)
-    TOPGG_MODEL_PROPERTY(size_t, monthly_votes)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string>, support)
-    TOPGG_MODEL_PROPERTY(size_t, shard_count)
-    TOPGG_MODEL_PROPERTY_REF(std::string, invite)
-    TOPGG_MODEL_PROPERTY_REF(std::string, url)
+  public:
+    std::string_view discriminator;
+    std::string_view prefix;
+    std::string_view short_description;
+    std::optional<std::string_view> long_description;
+    std::vector<std::string_view> tags;
+    std::optional<std::string_view> website;
+    std::optional<std::string_view> github;
+    std::vector<dpp::snowflake> owners;
+    std::vector<size_t> guilds;
+    std::optional<std::string_view> banner;
+    time_t approved_at;
+    bool is_certified;
+    std::vector<size_t> shards;
+    size_t votes;
+    size_t monthly_votes;
+    std::optional<std::string> support;
+    size_t shard_count;
+    std::string invite;
+    std::string url;
   };
   
   namespace autoposter {
@@ -127,11 +125,12 @@ namespace topgg {
     
     socials(const nlohmann::json& j);
     
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, github)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, instagram)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, reddit)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, twitter)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, youtube)
+  public:
+    std::optional<std::string_view> github;
+    std::optional<std::string_view> instagram;
+    std::optional<std::string_view> reddit;
+    std::optional<std::string_view> twitter;
+    std::optional<std::string_view> youtube;
   };
   
   class user: public account {
@@ -139,14 +138,15 @@ namespace topgg {
     
     user(const nlohmann::json& j);
     
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, bio)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<std::string_view>, banner)
-    TOPGG_MODEL_PROPERTY_REF(std::optional<socials>, socials)
-    TOPGG_MODEL_PROPERTY(bool, is_supporter)
-    TOPGG_MODEL_PROPERTY(bool, is_certified_dev)
-    TOPGG_MODEL_PROPERTY(bool, is_moderator)
-    TOPGG_MODEL_PROPERTY(bool, is_web_moderator)
-    TOPGG_MODEL_PROPERTY(bool, is_admin)
+  public:
+    std::optional<std::string_view> bio;
+    std::optional<std::string_view> banner;
+    std::optional<socials> socials;
+    bool is_supporter;
+    bool is_certified_dev;
+    bool is_moderator;
+    bool is_web_moderator;
+    bool is_admin;
   };
 };
 

@@ -19,7 +19,7 @@ int main() {
     try {
       const auto user = result.get();
     
-      std::cout << user.username() << std::endl;
+      std::cout << user.username << std::endl;
     } catch (const std::exception& ext) {
       std::cout << "error: " << ext.what() << std::endl;
     }
