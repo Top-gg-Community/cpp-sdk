@@ -13,9 +13,9 @@ The official C++ SDK for the [Top.gg API](https://docs.top.gg).
 
 int main() {
   dpp::cluster bot{"your bot token"};
-  topgg::client topgg{&bot, "your top.gg token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
 
-  topgg.get_user(661200758510977084, [](const auto& result) {
+  topgg_client.get_user(661200758510977084, [](const auto& result) {
     try {
       const auto user = result.get();
     
@@ -38,11 +38,11 @@ int main() {
 
 int main() {
   dpp::cluster bot{"your bot token"};
-  topgg::client topgg{&bot, "your top.gg token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
 
   const size_t server_count = 12345;
 
-  topgg.post_stats(topgg::stats{server_count}, []() {
+  topgg_client.post_stats(topgg::stats{server_count}, []() {
     std::cout << "stats posted!" << std::endl;
   });
 
@@ -59,9 +59,9 @@ int main() {
 
 int main() {
   dpp::cluster bot{"your bot token"};
-  topgg::client topgg{&bot, "your top.gg token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
 
-  topgg.has_voted(661200758510977084, [](const auto& result) {
+  topgg_client.has_voted(661200758510977084, [](const auto& result) {
     try {
       if (result.get()) {
         std::cout << "checks out" << std::endl;
