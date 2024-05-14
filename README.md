@@ -100,7 +100,7 @@ int main() {
 #include <dpp/dpp.h>
 #include <iostream>
 
-topgg::stats fetch_stats(dpp::cluster* bot) {
+static topgg::stats fetch_stats(dpp::cluster* bot) {
   // fetch server count here...
 }
 
