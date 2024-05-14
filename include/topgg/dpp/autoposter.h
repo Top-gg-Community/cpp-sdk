@@ -35,7 +35,7 @@ namespace topgg {
       semaphore() = delete;
     };
 #else
-    typedef std::binary_semaphore semaphore;
+    using semaphore = std::binary_semaphore;
 #endif
     
     class base;

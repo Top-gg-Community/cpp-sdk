@@ -11,7 +11,7 @@
 
 namespace topgg {
 #define TOPGG_API_CALLBACK(return_type, name) \
-  typedef std::function<void(const result<return_type>&)> name##_completion_t
+  using name##_completion_t = std::function<void(const result<return_type>&)> 
 
   TOPGG_API_CALLBACK(bot, get_bot);
   TOPGG_API_CALLBACK(user, get_user);
@@ -20,7 +20,7 @@ namespace topgg {
   TOPGG_API_CALLBACK(bool, has_voted);
   TOPGG_API_CALLBACK(bool, is_weekend);
   
-  typedef std::function<void(void)> post_stats_completion_t;
+  using post_stats_completion_t = std::function<void(void)>;
   
   class dpp_client {
     dpp::cluster* m_cluster;
