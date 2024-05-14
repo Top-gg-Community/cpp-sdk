@@ -12,8 +12,8 @@ The official C++ SDK for the [Top.gg API](https://docs.top.gg).
 #include <iostream>
 
 int main() {
-  dpp::cluster bot("your bot token");
-  topgg::client topgg(&bot, "your top.gg token");
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg{&bot, "your top.gg token"};
 
   topgg.get_user(661200758510977084, [](const auto& result) {
     try {
@@ -37,8 +37,8 @@ int main() {
 #include <iostream>
 
 int main() {
-  dpp::cluster bot("your bot token");
-  topgg::client topgg(&bot, "your top.gg token");
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg{&bot, "your top.gg token"};
 
   const size_t server_count = 12345;
 
@@ -58,8 +58,8 @@ int main() {
 #include <iostream>
 
 int main() {
-  dpp::cluster bot("your bot token");
-  topgg::client topgg(&bot, "your top.gg token");
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg{&bot, "your top.gg token"};
 
   topgg.has_voted(661200758510977084, [](const auto& result) {
     try {
@@ -83,9 +83,9 @@ int main() {
 #include <iostream>
 
 int main() {
-  std::shared_ptr<dpp::cluster> bot(new dpp::cluster("your bot token"));
+  std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
   
-  topgg::autoposter::cached autoposter(bot, "your top.gg token", std::chrono::minutes(15));
+  topgg::autoposter::cached autoposter{bot, "your top.gg token", std::chrono::minutes(15)};
 
   // your bot's code...
 
@@ -101,11 +101,11 @@ int main() {
 #include <iostream>
 
 int main() {
-  std::shared_ptr<dpp::cluster> bot(new dpp::cluster("your bot token"));
+  std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
   
-  topgg::autoposter::callback autoposter(bot, "your top.gg token", std::chrono::minutes(15), []() -> topgg::stats {
+  topgg::autoposter::callback autoposter{bot, "your top.gg token", std::chrono::minutes(15), []() -> topgg::stats {
     // fetch server count here...
-  });
+  }};
 
   // your bot's code...
 
