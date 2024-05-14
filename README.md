@@ -83,8 +83,9 @@ int main() {
 #include <iostream>
 
 int main() {
-  dpp::cluster bot("your bot token");
-  topgg::autoposter::cached autoposter(&bot, "your top.gg token", std::chrono::minutes(15));
+  std::shared_ptr<dpp::cluster> bot(new dpp::cluster("your bot token"));
+  
+  topgg::autoposter::cached autoposter(bot, "your top.gg token", std::chrono::minutes(15));
 
   // your bot's code...
 
