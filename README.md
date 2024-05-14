@@ -77,6 +77,8 @@ int main() {
 
 ### Cached autoposting
 
+If you want for the SDK to automatically retrieve server count by itself by listening and caching Discord's gateway events, use `topgg::autoposter::cached`!
+
 ```cpp
 #include <topgg/dpp.h>
 #include <dpp/dpp.h>
@@ -95,6 +97,8 @@ int main() {
 
 ### Stats-fed autoposting
 
+If you want to use your own function (e.g: retrieving the server count by making an SQL query) then you can use `topgg::autoposter::custom`!
+
 ```cpp
 #include <topgg/dpp.h>
 #include <dpp/dpp.h>
@@ -107,7 +111,7 @@ static topgg::stats fetch_stats(dpp::cluster* bot) {
 int main() {
   std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
   
-  topgg::autoposter::callback autoposter{bot, "your top.gg token", std::chrono::minutes(15), fetch_stats};
+  topgg::autoposter::custom autoposter{bot, "your top.gg token", std::chrono::minutes(15), fetch_stats};
 
   // your bot's code...
 

@@ -3,7 +3,6 @@
 
 using topgg::autoposter::killable_waiter;
 using topgg::autoposter::semaphore;
-using topgg::autoposter::callback;
 using topgg::autoposter::cached;
 using topgg::autoposter::base;
 using topgg::stats;
@@ -50,7 +49,7 @@ base::base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, con
       this->thread_prepare();
       this->m_mutex.lock();
 
-      const auto s = this->thread_get(thread_cluster.get());
+      const auto s = this->get_stats(thread_cluster.get());
       
       this->m_mutex.unlock();
       
@@ -68,12 +67,12 @@ base::base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, con
   });
 }
 
-void base::request_stop() {
+void base::stop() {
   m_waiter.kill();
 }
 
 base::~base() {
-  request_stop();
+  stop();
   m_thread.join();
 }
 
@@ -117,10 +116,10 @@ cached::cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token,
   });
 }
 
-void cached::request_stop() {
+void cached::stop() {
   m_mutex.lock();
   
-  base::request_stop();
+  base::stop();
   
   m_mutex.unlock();
 }
