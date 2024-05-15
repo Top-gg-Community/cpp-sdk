@@ -1,13 +1,12 @@
-#ifndef __TOPGG_CPP_SDK_DPP_AUTOPOSTER_H__
-#define __TOPGG_CPP_SDK_DPP_AUTOPOSTER_H__
+#pragma once
 
 #include <dpp/dpp.h>
 #include <topgg/dpp.h>
 
+#include <unordered_set>
 #include <chrono>
 #include <memory>
 #include <mutex>
-#include <set>
 
 #if __cplusplus < 202002L
 #include <condition_variable>
@@ -77,7 +76,7 @@ namespace topgg {
     class cached: public base {
       std::mutex m_mutex;
       semaphore m_semaphore;
-      std::set<dpp::snowflake> m_guilds;
+      std::unordered_set<dpp::snowflake> m_guilds;
       
       inline void before_fetch() override {
         m_semaphore.acquire();
@@ -112,4 +111,3 @@ namespace topgg {
     };
   };
 };
-#endif

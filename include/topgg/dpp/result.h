@@ -1,5 +1,4 @@
-#ifndef __TOPGG_CPP_SDK_DPP_RESULT_H__
-#define __TOPGG_CPP_SDK_DPP_RESULT_H__
+#pragma once
 
 #include <dpp/dpp.h>
 #include <nlohmann/json.hpp>
@@ -69,4 +68,3 @@ namespace topgg {
 };
 
 #undef TOPGG_ERROR_CLASS
-#endif

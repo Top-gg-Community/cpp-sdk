@@ -15,6 +15,10 @@ static void strptime(const char* s, const char* f, tm* t) {
   input.imbue(std::locale{setlocale(LC_ALL, nullptr)});
   input >> std::get_time(t, f);
 }
+
+#ifdef _MSC_VER
+#pragma warning(disable: 4101)
+#endif
 #endif
 
 #define SERIALIZE_PRIVATE_OPTIONAL(j, name) \

@@ -1,5 +1,4 @@
-#ifndef __TOPGG_CPP_SDK_DPP_MODELS_H__
-#define __TOPGG_CPP_SDK_DPP_MODELS_H__
+#pragma once
 
 #include <nlohmann/json.hpp>
 #include <dpp/dpp.h>
@@ -154,4 +153,3 @@ namespace topgg {
 #undef TOPGG_MODEL_PROPERTY
 #undef TOPGG_MODEL_PROPERTY_REF_VIS
 #undef TOPGG_MODEL_PROPERTY_REF
-#endif

@@ -1,5 +1,4 @@
-#ifndef __TOPGG_CPP_SDK_DPP_CLIENT_H__
-#define __TOPGG_CPP_SDK_DPP_CLIENT_H__
+#pragma once
 
 #include <dpp/dpp.h>
 #include <topgg/dpp.h>
@@ -42,4 +41,3 @@ namespace topgg {
 };
 
 #undef TOPGG_API_CALLBACK
-#endif
