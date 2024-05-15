@@ -17,17 +17,17 @@ if(WIN32)
 target_compile_definitions(topgg PUBLIC TOPGG_SHARED)
 target_compile_definitions(topgg PUBLIC __TOPGG_BUILDING__)
 
-if(MSVC AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/dpp.lib")
+if(MSVC)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/dpp.lib")
 execute_process(COMMAND powershell "-NoLogo" "-NoProfile" "-File" ".\\setup_dpp.ps1" WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /Oi /Oy /Gy")
+endif()
 endif()
 
 targeT_link_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps")
 target_link_libraries(topgg PUBLIC dpp)
-
-if(MSVC)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /Oi /Oy /Gy")
-endif()
-endif()
 
 set_target_properties(topgg PROPERTIES
   OUTPUT_NAME           topgg
