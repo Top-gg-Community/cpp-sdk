@@ -7,7 +7,6 @@ The official C++ SDK for the [Top.gg API](https://docs.top.gg).
 Windows (Microsoft Visual C++):
 
 ```bat
-powershell -NoLogo -NoProfile -File setup_dpp.ps1
 cmake -B build .
 msbuild build/topgg.sln -noLogo -p:Configuration=Release
 ```

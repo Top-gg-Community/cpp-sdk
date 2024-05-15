@@ -24,9 +24,11 @@ foreach ($dpp_release in $dpp_release_information) {
     $zip_directory = Get-ChildItem -Path .\dpp -Directory -Name
     $inside_include = Get-ChildItem -Path ".\dpp\$zip_directory\include" -Directory -Name
     
+    New-Item -Path . -Name deps -ItemType directory -Force
+    
     Move-Item -Path ".\dpp\$zip_directory\include\$inside_include\dpp" -Destination .\include\dpp -Force
-    Get-ChildItem -Path ".\dpp\$zip_directory\bin" -Recurse -File | Move-Item -Destination . -Force
-    Get-ChildItem -Path ".\dpp\$zip_directory\lib\$inside_include" -Recurse -File | Move-Item -Destination . -Force
+    Get-ChildItem -Path ".\dpp\$zip_directory\bin" -Recurse -File | Move-Item -Destination .\deps -Force
+    Get-ChildItem -Path ".\dpp\$zip_directory\lib\$inside_include" -Recurse -File | Move-Item -Destination .\deps -Force
     
     Remove-Item -Path .\dpp -Recurse -Force
     Remove-Item .\dpp.zip -Force
@@ -36,5 +38,5 @@ foreach ($dpp_release in $dpp_release_information) {
 }
 
 if ($failed) {
-  echo "Error: unable to find the matching DPP release for this machine."
+  $host.ui.WriteErrorLine("Error: unable to find the matching DPP release for this machine.")
 }

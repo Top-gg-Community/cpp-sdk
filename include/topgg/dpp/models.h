@@ -37,7 +37,7 @@ namespace topgg {
 #define TOPGG_MODEL_PROPERTY_REF(type, name) \
   TOPGG_MODEL_PROPERTY_REF_VIS(private, type, name)
   
-  class account {
+  class TOPGG_EXPORT account {
   protected:
     account(const dpp::json& j);
 
@@ -50,13 +50,13 @@ namespace topgg {
   
   class client;
   
-  class voter: public account {
+  class TOPGG_EXPORT voter: public account {
     friend class client;
     
     inline voter(const dpp::json& j): account(j) {}
   };
 
-  class bot: public account {
+  class TOPGG_EXPORT bot: public account {
     friend class client;
     
     bot(const dpp::json& j);
@@ -87,7 +87,7 @@ namespace topgg {
     class base;
   };
   
-  class stats {
+  class TOPGG_EXPORT stats {
     friend class client;
     friend class autoposter::base;
   
@@ -117,7 +117,7 @@ namespace topgg {
   
   class user;
 
-  class socials {
+  class TOPGG_EXPORT socials {
     friend class user;
     
     socials(const dpp::json& j);
@@ -130,7 +130,7 @@ namespace topgg {
     std::optional<std::string_view> youtube;
   };
   
-  class user: public account {
+  class TOPGG_EXPORT user: public account {
     friend class client;
     
     user(const dpp::json& j);

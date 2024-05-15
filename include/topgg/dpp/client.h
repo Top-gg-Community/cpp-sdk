@@ -21,7 +21,7 @@ namespace topgg {
   
   using post_stats_completion_t = std::function<void(void)>;
   
-  class client {
+  class TOPGG_EXPORT client {
     dpp::cluster* m_cluster;
     std::multimap<std::string, std::string> m_headers;
     

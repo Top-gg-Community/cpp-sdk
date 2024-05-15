@@ -9,7 +9,7 @@ using topgg::ratelimited;
 using topgg::not_found;
 using topgg::result;
 
-const char* internal_client_error::get_what(const dpp::http_error& http_error) {
+static const char* get_dpp_error_message(const dpp::http_error& http_error) {
   switch (http_error) {
   case dpp::h_unknown:
     return "Status unknown.";
@@ -55,7 +55,7 @@ const char* internal_client_error::get_what(const dpp::http_error& http_error) {
 template<typename T>
 T result<T>::get() const {
   if (response.error != dpp::h_success) {
-    throw internal_client_error(response.error, internal_client_error::get_what(response.error));
+    throw internal_client_error(response.error, get_dpp_error_message(response.error));
   } else if (response.status < 400) {
     return m_parse_fn(json::parse(m_response.body));
   } else {

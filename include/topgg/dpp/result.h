@@ -40,7 +40,6 @@ namespace topgg {
     dpp::http_error m_http_error;
   
     inline internal_client_error(dpp::http_error http_error, const char* message): m_http_error(http_error), std::runtime_error(message) {}
-    static const char* get_what(const dpp::http_error& http_error);
   public:
     inline constexpr dpp::http_error const& get_http_error() const noexcept {
       return m_http_error;
@@ -53,7 +52,7 @@ namespace topgg {
   class client;
   
   template<typename T>
-  class result {
+  class TOPGG_EXPORT result {
     const dpp::http_request_completion_t m_response;
     const std::function<T(dpp::json& json)> m_parse_fn;
     

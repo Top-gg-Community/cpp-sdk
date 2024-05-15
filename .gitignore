@@ -1,9 +1,3 @@
-**/*.exe
-**/*.dll
-**/*.lib
-**/*.obj
-**/*.pdb
-**/*.cmd
-
 include/dpp/
 build/
+deps/

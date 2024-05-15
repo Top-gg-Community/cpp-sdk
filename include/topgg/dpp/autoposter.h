@@ -47,7 +47,7 @@ namespace topgg {
       friend class base;
     };
     
-    class base {
+    class TOPGG_EXPORT base {
       killable_waiter m_waiter;
       std::thread m_thread;
       
@@ -69,7 +69,7 @@ namespace topgg {
       ~base();
     };
     
-    class cached: public base {
+    class TOPGG_EXPORT cached: public base {
       std::mutex m_mutex;
       killable_semaphore m_semaphore;
       std::unordered_set<dpp::snowflake> m_guilds;
@@ -90,7 +90,7 @@ namespace topgg {
       void stop();
     };
     
-    class custom: public base {
+    class TOPGG_EXPORT custom: public base {
       std::function<::topgg::stats(dpp::cluster*)> m_callback;
       
       inline ::topgg::stats get_stats(dpp::cluster* bot) override {
