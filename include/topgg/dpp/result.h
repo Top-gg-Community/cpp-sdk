@@ -1,7 +1,6 @@
 #pragma once
 
 #include <dpp/dpp.h>
-#include <nlohmann/json.hpp>
 
 #include <topgg/dpp.h>
 
@@ -57,9 +56,9 @@ namespace topgg {
   template<typename T>
   class result {
     const dpp::http_request_completion_t m_response;
-    const std::function<T(nlohmann::json& json)> m_parse_fn;
+    const std::function<T(dpp::json& json)> m_parse_fn;
     
-    inline constexpr result(dpp::http_request_completion_t response, std::function<T(const nlohmann::json& json)> parse_fn): m_response(response), m_parse_fn(parse_fn) {}
+    inline constexpr result(dpp::http_request_completion_t response, std::function<T(const dpp::json& json)> parse_fn): m_response(response), m_parse_fn(parse_fn) {}
   public:
     T get() const;
   

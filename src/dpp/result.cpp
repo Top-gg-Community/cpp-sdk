@@ -1,6 +1,6 @@
 #include <topgg/dpp.h>
 
-using nlohmann::json;
+using dpp::json;
 
 using topgg::internal_client_error;
 using topgg::internal_server_error;

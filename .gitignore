@@ -6,5 +6,4 @@
 **/*.cmd
 
 include/dpp/
-include/nlohmann/
 build/

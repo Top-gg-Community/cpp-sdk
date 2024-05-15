@@ -78,7 +78,7 @@ static void strptime(const char* s, const char* f, tm* t) {
     }                                                             \
   })
 
-account::account(const nlohmann::json& j) {
+account::account(const dpp::json& j) {
   id = dpp::snowflake{j["id"].template get<std::string_view>()};
   
   DESERIALIZE(j, username, std::string_view);
@@ -95,7 +95,7 @@ account::account(const nlohmann::json& j) {
   created_at = static_cast<time_t>(((id >> 22) / 1000) + 1420070400);
 }
 
-bot::bot(const nlohmann::json& j): account(j), url("https://top.gg/bot/") {
+bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
   DESERIALIZE(j, discriminator, std::string_view);
   DESERIALIZE(j, prefix, std::string_view);
   DESERIALIZE_ALIAS(j, shortdesc, short_description, std::string_view);
@@ -155,7 +155,7 @@ bot::bot(const nlohmann::json& j): account(j), url("https://top.gg/bot/") {
   }
 }
 
-stats::stats(const nlohmann::json& j) {
+stats::stats(const dpp::json& j) {
   DESERIALIZE_PRIVATE_OPTIONAL(j, shard_count, size_t);
   DESERIALIZE_PRIVATE_OPTIONAL(j, server_count, size_t);
   DESERIALIZE_PRIVATE_OPTIONAL(j, shards, std::vector<size_t>);
@@ -172,7 +172,7 @@ stats::stats(const std::vector<size_t>& shards, const size_t shard_index): m_sha
 }
 
 std::string stats::to_json() const {
-  nlohmann::json j;
+  dpp::json j;
   
   SERIALIZE_PRIVATE_OPTIONAL(j, shard_count);
   SERIALIZE_PRIVATE_OPTIONAL(j, server_count);
@@ -206,7 +206,7 @@ std::optional<size_t> stats::server_count() const noexcept {
   }
 }
 
-socials::socials(const nlohmann::json& j) {
+socials::socials(const dpp::json& j) {
   DESERIALIZE_OPTIONAL_STRING(j, github);
   DESERIALIZE_OPTIONAL_STRING(j, instagram);
   DESERIALIZE_OPTIONAL_STRING(j, reddit);
@@ -214,12 +214,12 @@ socials::socials(const nlohmann::json& j) {
   DESERIALIZE_OPTIONAL_STRING(j, youtube);
 }
 
-user::user(const nlohmann::json& j): account(j) {
+user::user(const dpp::json& j): account(j) {
   DESERIALIZE_OPTIONAL_STRING(j, bio);
   DESERIALIZE_OPTIONAL_STRING(j, banner);
   
   if (j.contains("contains")) {
-    socials = std::optional{topgg::socials::socials{j["socials"].template get<nlohmann::json>()}};
+    socials = std::optional{topgg::socials::socials{j["socials"].template get<dpp::json>()}};
   }
   
   DESERIALIZE_ALIAS(j, supporter, is_supporter, bool);

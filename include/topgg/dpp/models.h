@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
 #include <dpp/dpp.h>
 
 #include <topgg/dpp.h>
@@ -41,7 +40,7 @@ namespace topgg {
   
   class account {
   protected:
-    account(const nlohmann::json& j);
+    account(const dpp::json& j);
 
   public:
     dpp::snowflake id;
@@ -55,13 +54,13 @@ namespace topgg {
   class voter: public account {
     friend class client;
     
-    inline voter(const nlohmann::json& j): account(j) {}
+    inline voter(const dpp::json& j): account(j) {}
   };
 
   class bot: public account {
     friend class client;
     
-    bot(const nlohmann::json& j);
+    bot(const dpp::json& j);
     
   public:
     std::string_view discriminator;
@@ -93,7 +92,7 @@ namespace topgg {
     friend class client;
     friend class autoposter::base;
   
-    stats(const nlohmann::json& j);
+    stats(const dpp::json& j);
   
     std::optional<size_t> m_shard_count;
     std::optional<std::vector<size_t>> m_shards;
@@ -122,7 +121,7 @@ namespace topgg {
   class socials {
     friend class user;
     
-    socials(const nlohmann::json& j);
+    socials(const dpp::json& j);
     
   public:
     std::optional<std::string_view> github;
@@ -135,7 +134,7 @@ namespace topgg {
   class user: public account {
     friend class client;
     
-    user(const nlohmann::json& j);
+    user(const dpp::json& j);
     
   public:
     std::optional<std::string_view> bio;
