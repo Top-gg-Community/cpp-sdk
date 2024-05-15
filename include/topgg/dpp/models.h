@@ -1,7 +1,6 @@
 #pragma once
 
 #include <dpp/dpp.h>
-
 #include <topgg/dpp.h>
 
 #include <string_view>
