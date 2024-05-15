@@ -13,6 +13,12 @@ add_library(topgg SHARED ${TOPGG_SOURCE_FILES})
 
 target_include_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+set_target_properties(topgg PROPERTIES
+  OUTPUT_NAME           topgg
+  CXX_STANDARD          17
+  CXX_STANDARD_REQUIRED ON
+)
+
 if(WIN32)
 target_compile_definitions(topgg PUBLIC TOPGG_SHARED)
 target_compile_definitions(topgg PUBLIC __TOPGG_BUILDING__)
@@ -30,9 +36,3 @@ endif()
 
 targeT_link_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps")
 target_link_libraries(topgg PUBLIC dpp)
-
-set_target_properties(topgg PROPERTIES
-  OUTPUT_NAME           topgg
-  CXX_STANDARD          17
-  CXX_STANDARD_REQUIRED ON
-)
