@@ -1,32 +1,40 @@
 #include <topgg/dpp.h>
 #include <stdexcept>
 
+using topgg::autoposter::killable_semaphore;
 using topgg::autoposter::killable_waiter;
-using topgg::autoposter::semaphore;
 using topgg::autoposter::cached;
 using topgg::autoposter::base;
 using topgg::stats;
 
-#if __cplusplus < 202002L
-void semaphore::release() {
+void killable_semaphore::release() {
   std::lock_guard<std::mutex> lock{m_mutex};
+  
   ++m_count;
   m_condition.notify_one();
 }
 
-void semaphore::acquire() {
+bool killable_semaphore::acquire() {
   std::unique_lock<std::mutex> lock{m_mutex};
   
-  while (!m_count) {
+  while (!m_count || !m_killed) {
     m_condition.wait(lock);
   }
   
   m_count = 0;
+  return !m_killed;
 }
-#endif
+
+void killable_semaphore::kill() {
+  std::lock_guard<std::mutex> lock{m_mutex};
+  
+  m_killed = true;
+  m_condition.notify_one();
+}
 
 void killable_waiter::kill() {
   std::lock_guard<std::mutex> lock{m_mutex};
+
   m_killed = true;
   m_condition.notify_one();
 }
@@ -45,9 +53,7 @@ base::base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, con
   m_thread = std::thread([this, token, delay]() {
     std::shared_ptr<dpp::cluster> thread_cluster{this->m_cluster};
 
-    while (this->m_waiter.wait(delay)) {
-      this->before_fetch();
-
+    while (this->m_waiter.wait(delay) && this->before_fetch()) {
       const auto s = this->get_stats(thread_cluster.get());
       
       this->after_fetch();
@@ -115,10 +121,17 @@ cached::cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token,
   });
 }
 
+bool cached::before_fetch() {
+  if (m_semaphore.acquire()) {
+    m_mutex.lock();
+    
+    return true;
+  }
+  
+  return false;
+}
+
 void cached::stop() {
-  m_mutex.lock();
-  
   base::stop();
-  
-  m_mutex.unlock();
+  m_semaphore.kill();
 }

@@ -3,39 +3,32 @@
 #include <dpp/dpp.h>
 #include <topgg/dpp.h>
 
+#include <condition_variable>
 #include <unordered_set>
 #include <chrono>
 #include <memory>
 #include <mutex>
 
-#if __cplusplus < 202002L
-#include <condition_variable>
-#else
-#include <semaphore>
-#endif
-
 namespace topgg {
   namespace autoposter {
-#if __cplusplus < 202002L
     class cached;
     
-    class semaphore {
+    class killable_semaphore {
       std::mutex m_mutex;
       std::condition_variable m_condition;
       size_t m_count;
+      bool m_killed;
 
-      inline semaphore(const size_t count): m_count(count) {}
+      inline killable_semaphore(const size_t count): m_count(count) {}
       
       void release();
-      void acquire();
+      bool acquire();
+      void kill();
       
       friend class cached;
     public:
-      semaphore() = delete;
+      killable_semaphore() = delete;
     };
-#else
-    using semaphore = std::binary_semaphore;
-#endif
     
     class base;
 
@@ -58,7 +51,10 @@ namespace topgg {
       killable_waiter m_waiter;
       std::thread m_thread;
       
-      virtual inline void before_fetch() {}
+      virtual inline bool before_fetch() {
+        return true;
+      }
+      
       virtual inline void after_fetch() {}
       virtual ::topgg::stats get_stats(dpp::cluster* bot) = 0;
       
@@ -75,14 +71,10 @@ namespace topgg {
     
     class cached: public base {
       std::mutex m_mutex;
-      semaphore m_semaphore;
+      killable_semaphore m_semaphore;
       std::unordered_set<dpp::snowflake> m_guilds;
       
-      inline void before_fetch() override {
-        m_semaphore.acquire();
-        m_mutex.lock();
-      }
-      
+      bool before_fetch() override;
       inline void after_fetch() override {
         m_mutex.unlock();
       }
