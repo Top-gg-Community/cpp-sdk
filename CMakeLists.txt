@@ -16,6 +16,7 @@ target_include_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 if(WIN32)
 target_compile_definitions(topgg PUBLIC TOPGG_SHARED)
 target_compile_definitions(topgg PUBLIC __TOPGG_BUILDING__)
+endif()
 
 if(MSVC)
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/dpp.lib")
@@ -23,7 +24,8 @@ execute_process(COMMAND powershell "-NoLogo" "-NoProfile" "-File" ".\\setup_dpp.
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /Oi /Oy /Gy")
-endif()
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall")
 endif()
 
 targeT_link_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps")
