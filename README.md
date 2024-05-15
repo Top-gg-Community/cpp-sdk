@@ -2,6 +2,16 @@
 
 The official C++ SDK for the [Top.gg API](https://docs.top.gg).
 
+## Building from source
+
+Windows (Microsoft Visual C++):
+
+```
+powershell -NoLogo -NoProfile -File setup_dpp.ps1
+cmake -B build .
+msbuild build/topgg.sln -noLogo -p:Configuration=Release
+```
+
 ## D++ examples
 
 ### Fetching a user from its Discord ID
