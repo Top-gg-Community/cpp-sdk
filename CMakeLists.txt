@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.8.2)
 
-project(topgg)
+project(
+  topgg
+  LANGUAGES CXX
+  HOMEPAGE_URL "https://docs.top.gg/docs"
+  DESCRIPTION "The official C++ wrapper for the Top.gg API."
+)
 
 file(GLOB TOPGG_SOURCE_FILES src/dpp/*.cpp)
 
