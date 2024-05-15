@@ -34,5 +34,5 @@ else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall")
 endif()
 
-targeT_link_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps")
+target_link_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps")
 target_link_libraries(topgg PUBLIC dpp)
