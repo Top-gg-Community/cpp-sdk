@@ -1,7 +1,7 @@
 #include <topgg/dpp.h>
 
+using topgg::user_socials;
 using topgg::account;
-using topgg::socials;
 using topgg::stats;
 using topgg::user;
 using topgg::bot;
@@ -33,7 +33,7 @@ static void strptime(const char* s, const char* f, tm* t) {
   prop = j[#name].template get<type>()
 
 #define IGNORE_EXCEPTION(scope) \
-  try scope catch (const std::exception& _) {}
+  try scope catch (TOPGG_UNUSED const std::exception& _) {}
 
 #define DESERIALIZE_VECTOR(j, name, type)                  \
   IGNORE_EXCEPTION({                                       \
@@ -88,7 +88,7 @@ account::account(const dpp::json& j) {
     const char* ext = hash.rfind("a_", 0) == 0 ? "gif" : "png";
 
     avatar = "https://cdn.discordapp.com/avatars/" + std::to_string(id) + "/" + hash + "." + ext + "?size=1024";
-  } catch (const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception& _) {
     avatar = "https://cdn.discordapp.com/embed/avatars/" + std::to_string((id >> 22) % 5) + ".png";
   }
   
@@ -130,7 +130,7 @@ bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
 
   try {
     DESERIALIZE(j, invite, std::string);
-  } catch (const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception& _) {
     invite = "https://discord.com/oauth2/authorize?scope=bot&client_id=" + std::to_string(id);
   }
   
@@ -144,13 +144,13 @@ bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
   
   try {
     DESERIALIZE(j, shard_count, size_t);
-  } catch (const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception& _) {
     shard_count = shards.size();
   }
   
   try {
     url.append(j["vanity"].template get<std::string_view>());
-  } catch (const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception& _) {
     url.append(std::to_string(id));
   }
 }
@@ -206,7 +206,7 @@ std::optional<size_t> stats::server_count() const noexcept {
   }
 }
 
-socials::socials(const dpp::json& j) {
+user_socials::user_socials(const dpp::json& j) {
   DESERIALIZE_OPTIONAL_STRING(j, github);
   DESERIALIZE_OPTIONAL_STRING(j, instagram);
   DESERIALIZE_OPTIONAL_STRING(j, reddit);
@@ -219,7 +219,7 @@ user::user(const dpp::json& j): account(j) {
   DESERIALIZE_OPTIONAL_STRING(j, banner);
   
   if (j.contains("contains")) {
-    socials = std::optional{topgg::socials::socials{j["socials"].template get<dpp::json>()}};
+    socials = std::optional{user_socials{j["socials"].template get<dpp::json>()}};
   }
   
   DESERIALIZE_ALIAS(j, supporter, is_supporter, bool);

@@ -26,7 +26,7 @@ namespace topgg {
   class ratelimited: public std::runtime_error {
     const uint16_t m_retry_after;
   
-    inline ratelimited(const uint16_t retry_after): m_retry_after(retry_after), std::runtime_error("This client is ratelimited from further requests. Please try again later.") {}
+    inline ratelimited(const uint16_t retry_after): std::runtime_error("This client is ratelimited from further requests. Please try again later."), m_retry_after(retry_after) {}
   public:
     inline constexpr uint16_t retry_after() const noexcept {
       return m_retry_after;
@@ -39,7 +39,7 @@ namespace topgg {
   class internal_client_error: public std::runtime_error {
     dpp::http_error m_http_error;
   
-    inline internal_client_error(dpp::http_error http_error, const char* message): m_http_error(http_error), std::runtime_error(message) {}
+    inline internal_client_error(dpp::http_error http_error, const char* message): std::runtime_error(message), m_http_error(http_error) {}
   public:
     inline constexpr dpp::http_error const& get_http_error() const noexcept {
       return m_http_error;

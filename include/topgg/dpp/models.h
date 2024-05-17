@@ -102,7 +102,7 @@ namespace topgg {
   
   public:
     inline stats(const size_t server_count): m_server_count(std::optional{server_count}) {}
-    inline stats(const size_t server_count, const size_t shard_count): m_server_count(std::optional{shard_count}), m_shard_count(std::optional{shard_count}) {}
+    inline stats(const size_t server_count, const size_t shard_count): m_shard_count(std::optional{shard_count}), m_server_count(std::optional{server_count}) {}
     
     stats(const std::vector<size_t>& shards, const size_t shard_index);
     
@@ -117,10 +117,10 @@ namespace topgg {
   
   class user;
 
-  class TOPGG_EXPORT socials {
+  class TOPGG_EXPORT user_socials {
     friend class user;
     
-    socials(const dpp::json& j);
+    user_socials(const dpp::json& j);
     
   public:
     std::optional<std::string_view> github;
@@ -138,7 +138,7 @@ namespace topgg {
   public:
     std::optional<std::string_view> bio;
     std::optional<std::string_view> banner;
-    std::optional<socials> socials;
+    std::optional<user_socials> socials;
     bool is_supporter;
     bool is_certified_dev;
     bool is_moderator;

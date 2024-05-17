@@ -34,7 +34,7 @@ void client::post_stats(const stats& s, topgg::post_stats_completion_t callback)
   
   headers.insert(std::pair("Content-Length", std::to_string(s_json.size())));
   
-  m_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [callback](const auto& _) {
+  m_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [callback](TOPGG_UNUSED const auto& _) {
     callback();
   }, s_json, "application/json", headers);
 }

@@ -11,28 +11,30 @@ file(GLOB TOPGG_SOURCE_FILES src/dpp/*.cpp)
 
 add_library(topgg SHARED ${TOPGG_SOURCE_FILES})
 
-target_include_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
 set_target_properties(topgg PROPERTIES
   OUTPUT_NAME           topgg
   CXX_STANDARD          17
   CXX_STANDARD_REQUIRED ON
 )
 
-if(WIN32)
-target_compile_definitions(topgg PUBLIC TOPGG_SHARED)
-target_compile_definitions(topgg PUBLIC __TOPGG_BUILDING__)
-endif()
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
+find_package(DPP REQUIRED)
 
 if(MSVC)
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/dpp.lib")
-execute_process(COMMAND powershell "-NoLogo" "-NoProfile" "-File" ".\\setup_dpp.ps1" WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /Oi /Oy /Gy")
 else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Wpedantic -Wformat=2 -Wnull-dereference -Wuninitialized -Wdeprecated")
 endif()
 
-target_link_directories(topgg PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps")
-target_link_libraries(topgg PUBLIC dpp)
+if(WIN32)
+target_compile_definitions(topgg PRIVATE TOPGG_SHARED)
+target_compile_definitions(topgg PRIVATE __TOPGG_BUILDING__)
+endif()
+
+target_include_directories(topgg PUBLIC
+  ${CMAKE_SOURCE_DIR}/include
+  ${DPP_INCLUDE_DIR}
+)
+
+target_link_libraries(topgg ${DPP_LIBRARIES})

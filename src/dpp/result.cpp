@@ -54,17 +54,17 @@ static const char* get_dpp_error_message(const dpp::http_error& http_error) {
 
 template<typename T>
 T result<T>::get() const {
-  if (response.error != dpp::h_success) {
-    throw internal_client_error(response.error, get_dpp_error_message(response.error));
-  } else if (response.status < 400) {
+  if (m_response.error != dpp::h_success) {
+    throw internal_client_error(m_response.error, get_dpp_error_message(m_response.error));
+  } else if (m_response.status < 400) {
     return m_parse_fn(json::parse(m_response.body));
   } else {
-    switch (response.status) {
+    switch (m_response.status) {
     case 401:
-      throw invalid_token_error();
+      throw invalid_token();
     
     case 404:
-      throw not_found_error();
+      throw not_found();
     
     case 429: {
       const auto j = json::parse(m_response.body);

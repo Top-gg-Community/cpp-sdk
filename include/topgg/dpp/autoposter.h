@@ -79,7 +79,7 @@ namespace topgg {
         m_mutex.unlock();
       }
       
-      inline ::topgg::stats get_stats(dpp::cluster* _) override {
+      inline ::topgg::stats get_stats(TOPGG_UNUSED dpp::cluster* _) override {
         return ::topgg::stats{m_guilds.size()};
       }
       

@@ -11,6 +11,12 @@
 #define TOPGG_EXPORT
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define TOPGG_UNUSED __attribute__((unused))
+#else
+#define TOPGG_UNUSED
+#endif
+
 #include <topgg/dpp/result.h>
 #include <topgg/dpp/models.h>
 #include <topgg/dpp/client.h>

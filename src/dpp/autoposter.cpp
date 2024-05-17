@@ -60,14 +60,14 @@ base::base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, con
       
       const auto s_json = s.to_json();
       const std::multimap<std::string, std::string> headers = {
-        {"Authorization", "Bearer " + token};
+        {"Authorization", "Bearer " + token},
         {"Connection", "close"},
         {"Content-Type", "application/json"},
         {"Content-Length", std::to_string(s_json.size())},
         {"User-Agent", "topgg (https://github.com/top-gg-community/cpp-sdk) D++"}
       };
       
-      thread_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [](const auto& _) {}, s_json, "application/json", headers);
+      thread_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [](TOPGG_UNUSED const auto& _) {}, s_json, "application/json", headers);
     }
   });
 }
@@ -82,7 +82,7 @@ base::~base() {
 }
 
 template<class R, class P>
-cached::cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay): base(cluster, token, delay), m_semaphore(semaphore{0}) {
+cached::cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay): base(cluster, token, delay), m_semaphore(killable_semaphore{0}) {
   auto this_cluster = m_cluster.get();
   
   if (delay < std::chrono::minutes(15)) {
