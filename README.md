@@ -9,7 +9,7 @@ Linux (Debian-like):
 ```sh
 # install D++
 wget -O dpp.deb https://dl.dpp.dev/latest
-sudo dpkg -i dpp.deb
+dpkg -i dpp.deb
 
 # build topgg
 cmake -B build .
@@ -21,9 +21,9 @@ Linux (CentOS-like):
 
 ```sh
 # install D++
-sudo yum install wget
+yum install wget
 wget -O dpp.rpm https://dl.dpp.dev/latest/linux-x64/rpm
-sudo yum localinstall dpp.rpm
+yum localinstall dpp.rpm
 
 # build topgg
 cmake -B build .
