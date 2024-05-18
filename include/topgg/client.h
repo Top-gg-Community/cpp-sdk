@@ -1,6 +1,6 @@
 #pragma once
 
-#include <topgg/dpp.h>
+#include <topgg/topgg.h>
 
 #include <functional>
 #include <vector>

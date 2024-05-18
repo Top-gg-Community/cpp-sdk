@@ -29,7 +29,7 @@
 #pragma clang diagnostic pop
 #endif
 
-#include <topgg/dpp/result.h>
-#include <topgg/dpp/models.h>
-#include <topgg/dpp/client.h>
-#include <topgg/dpp/autoposter.h>
+#include <topgg/result.h>
+#include <topgg/models.h>
+#include <topgg/client.h>
+#include <topgg/autoposter.h>

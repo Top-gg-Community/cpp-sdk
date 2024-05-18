@@ -1,4 +1,4 @@
-#include <topgg/dpp.h>
+#include <topgg/topgg.h>
 #include <stdexcept>
 
 using topgg::autoposter::killable_semaphore;

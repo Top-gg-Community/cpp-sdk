@@ -7,7 +7,7 @@ project(
   DESCRIPTION "The official C++ wrapper for the Top.gg API."
 )
 
-file(GLOB TOPGG_SOURCE_FILES src/dpp/*.cpp)
+file(GLOB TOPGG_SOURCE_FILES src/*.cpp)
 
 add_library(topgg SHARED ${TOPGG_SOURCE_FILES})
 

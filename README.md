@@ -51,12 +51,12 @@ cmake -B build .
 msbuild build/topgg.sln -noLogo -p:Configuration=Release
 ```
 
-## D++ examples
+## Examples
 
 ### Fetching a user from its Discord ID
 
 ```cpp
-#include <topgg/dpp.h>
+#include <topgg/topgg.h>
 #include <dpp/dpp.h>
 #include <iostream>
 
@@ -81,7 +81,7 @@ int main() {
 ### Posting your bot's statistics
 
 ```cpp
-#include <topgg/dpp.h>
+#include <topgg/topgg.h>
 #include <dpp/dpp.h>
 #include <iostream>
 
@@ -102,7 +102,7 @@ int main() {
 ### Checking if a user has voted your bot
 
 ```cpp
-#include <topgg/dpp.h>
+#include <topgg/topgg.h>
 #include <dpp/dpp.h>
 #include <iostream>
 
@@ -129,7 +129,7 @@ int main() {
 If you want for the SDK to automatically retrieve server count itself by listening to Discord's gateway events, use `topgg::autoposter::cached`!
 
 ```cpp
-#include <topgg/dpp.h>
+#include <topgg/topgg.h>
 #include <dpp/dpp.h>
 
 int main() {
@@ -148,7 +148,7 @@ int main() {
 If you want to use your own function (e.g: retrieve the server count on your own by making an SQL query), then you can use `topgg::autoposter::custom`!
 
 ```cpp
-#include <topgg/dpp.h>
+#include <topgg/topgg.h>
 #include <dpp/dpp.h>
 
 static topgg::stats fetch_stats(dpp::cluster* bot) {
