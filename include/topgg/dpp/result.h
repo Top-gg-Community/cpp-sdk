@@ -1,6 +1,5 @@
 #pragma once
 
-#include <dpp/dpp.h>
 #include <topgg/dpp.h>
 
 #include <functional>
@@ -56,7 +55,7 @@ namespace topgg {
     const dpp::http_request_completion_t m_response;
     const std::function<T(dpp::json& json)> m_parse_fn;
     
-    inline constexpr result(dpp::http_request_completion_t response, std::function<T(const dpp::json& json)> parse_fn): m_response(response), m_parse_fn(parse_fn) {}
+    inline result(dpp::http_request_completion_t response, std::function<T(const dpp::json& json)> parse_fn): m_response(response), m_parse_fn(parse_fn) {}
   public:
     T get() const;
   

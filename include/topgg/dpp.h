@@ -17,6 +17,18 @@
 #define TOPGG_UNUSED
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-literal-operator"
+#pragma clang diagnostic ignored "-Wdeprecated-copy-with-dtor"
+#endif
+
+#include <dpp/dpp.h>
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #include <topgg/dpp/result.h>
 #include <topgg/dpp/models.h>
 #include <topgg/dpp/client.h>

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <dpp/dpp.h>
 #include <topgg/dpp.h>
 
 #include <condition_variable>
@@ -87,7 +86,7 @@ namespace topgg {
       template<class R, class P>
       cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay);
     
-      void stop();
+      void stop() override;
     };
     
     class TOPGG_EXPORT custom: public base {

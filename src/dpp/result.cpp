@@ -9,6 +9,11 @@ using topgg::ratelimited;
 using topgg::not_found;
 using topgg::result;
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
 static const char* get_dpp_error_message(const dpp::http_error& http_error) {
   switch (http_error) {
   case dpp::h_unknown:
@@ -51,6 +56,10 @@ static const char* get_dpp_error_message(const dpp::http_error& http_error) {
     return "";
   }
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 template<typename T>
 T result<T>::get() const {
