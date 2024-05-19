@@ -10,13 +10,11 @@
   class class_name: public parent_class {                          \
     inline class_name(): parent_class(what_response) {}            \
                                                                    \
-    template<typename T>                                           \
-    friend class result;                                           \
+    friend class result_internal;                                  \
   }
 
 namespace topgg {
-  template<typename T>
-  class result;
+  class result_internal;
   
   TOPGG_ERROR_CLASS(internal_server_error, std::runtime_error, "Received an unexpected error from Top.gg's end.");
   TOPGG_ERROR_CLASS(invalid_token, std::invalid_argument, "Invalid Top.gg API token.");
@@ -31,8 +29,7 @@ namespace topgg {
       return m_retry_after;
     }
     
-    template<typename T>
-    friend class result;
+    friend class result_internal;
   };
   
   class internal_client_error: public std::runtime_error {
@@ -44,20 +41,34 @@ namespace topgg {
       return m_http_error;
     }
     
-    template<typename T>
-    friend class result;
+    friend class result_internal;
   };
   
   class client;
   
-  template<typename T>
-  class TOPGG_EXPORT result {
+  // this doesn't need to be exported smh
+  class TOPGG_EXPORT result_internal {
+  protected:
     const dpp::http_request_completion_t m_response;
+  
+    void prepare() const;
+    inline result_internal(dpp::http_request_completion_t response): m_response(response) {}
+    
+  public:
+    result_internal() = delete;
+  };
+  
+  template<typename T>
+  class TOPGG_EXPORT result: private result_internal {
     const std::function<T(dpp::json& json)> m_parse_fn;
     
-    inline result(dpp::http_request_completion_t response, std::function<T(const dpp::json& json)> parse_fn): m_response(response), m_parse_fn(parse_fn) {}
+    inline result(dpp::http_request_completion_t response, std::function<T(const dpp::json& json)> parse_fn): result_internal(response), m_parse_fn(parse_fn) {}
   public:
-    T get() const;
+    T get() const {
+      result_internal::prepare();
+      
+      return m_parse_fn(dpp::json::parse(m_response.body));
+    }
   
     friend class client;
   };

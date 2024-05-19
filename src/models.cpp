@@ -62,7 +62,7 @@ static void strptime(const char* s, const char* f, tm* t) {
 
 #define DESERIALIZE_OPTIONAL_STRING(j, name)                      \
   IGNORE_EXCEPTION({                                              \
-    const auto value = j[#name].template get<std::string_view>(); \
+    const auto value = j[#name].template get<std::string>(); \
                                                                   \
     if (value.size() > 0) {                                       \
       name = std::optional{value};                                \
@@ -71,7 +71,7 @@ static void strptime(const char* s, const char* f, tm* t) {
 
 #define DESERIALIZE_OPTIONAL_STRING_ALIAS(j, name, prop)          \
   IGNORE_EXCEPTION({                                              \
-    const auto value = j[#name].template get<std::string_view>(); \
+    const auto value = j[#name].template get<std::string>(); \
                                                                   \
     if (value.size() > 0) {                                       \
       prop = std::optional{value};                                \
@@ -79,9 +79,9 @@ static void strptime(const char* s, const char* f, tm* t) {
   })
 
 account::account(const dpp::json& j) {
-  id = dpp::snowflake{j["id"].template get<std::string_view>()};
+  id = dpp::snowflake{j["id"].template get<std::string>()};
   
-  DESERIALIZE(j, username, std::string_view);
+  DESERIALIZE(j, username, std::string);
   
   try {
     const auto hash = j["avatar"].template get<std::string>();
@@ -96,16 +96,16 @@ account::account(const dpp::json& j) {
 }
 
 bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
-  DESERIALIZE(j, discriminator, std::string_view);
-  DESERIALIZE(j, prefix, std::string_view);
-  DESERIALIZE_ALIAS(j, shortdesc, short_description, std::string_view);
+  DESERIALIZE(j, discriminator, std::string);
+  DESERIALIZE(j, prefix, std::string);
+  DESERIALIZE_ALIAS(j, shortdesc, short_description, std::string);
   DESERIALIZE_OPTIONAL_STRING_ALIAS(j, longdesc, long_description);
-  DESERIALIZE_VECTOR(j, tags, std::string_view);
+  DESERIALIZE_VECTOR(j, tags, std::string);
   DESERIALIZE_OPTIONAL_STRING(j, website);
   DESERIALIZE_OPTIONAL_STRING(j, github);
   
   IGNORE_EXCEPTION({
-    const auto j_owners = j["owners"].template get<std::vector<std::string_view>>();
+    const auto j_owners = j["owners"].template get<std::vector<std::string>>();
     
     owners.reserve(j_owners.size());
     
@@ -117,7 +117,7 @@ bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
   DESERIALIZE_VECTOR(j, guilds, size_t);
   DESERIALIZE_OPTIONAL_STRING_ALIAS(j, bannerUrl, banner);
 
-  const auto j_approved_at = j["date"].template get<std::string_view>();
+  const auto j_approved_at = j["date"].template get<std::string>();
   tm approved_at_tm;
   
   strptime(j_approved_at.data(), "%Y-%m-%dT%H:%M:%S", &approved_at_tm);
@@ -149,7 +149,7 @@ bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
   }
   
   try {
-    url.append(j["vanity"].template get<std::string_view>());
+    url.append(j["vanity"].template get<std::string>());
   } catch (TOPGG_UNUSED const std::exception& _) {
     url.append(std::to_string(id));
   }

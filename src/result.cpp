@@ -4,10 +4,10 @@ using dpp::json;
 
 using topgg::internal_client_error;
 using topgg::internal_server_error;
+using topgg::result_internal;
 using topgg::invalid_token;
 using topgg::ratelimited;
 using topgg::not_found;
-using topgg::result;
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -61,13 +61,10 @@ static const char* get_dpp_error_message(const dpp::http_error& http_error) {
 #pragma clang diagnostic pop
 #endif
 
-template<typename T>
-T result<T>::get() const {
+void result_internal::prepare() const {
   if (m_response.error != dpp::h_success) {
     throw internal_client_error(m_response.error, get_dpp_error_message(m_response.error));
-  } else if (m_response.status < 400) {
-    return m_parse_fn(json::parse(m_response.body));
-  } else {
+  } else if (m_response.status >= 400) {
     switch (m_response.status) {
     case 401:
       throw invalid_token();

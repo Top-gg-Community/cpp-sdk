@@ -2,7 +2,7 @@
 
 #include <topgg/topgg.h>
 
-#include <string_view>
+#include <string>
 #include <optional>
 #include <string>
 #include <vector>
@@ -43,34 +43,32 @@ namespace topgg {
   public:
     dpp::snowflake id;
     std::string avatar;
-    std::string_view username;
+    std::string username;
     time_t created_at;
   };
   
   class client;
   
   class TOPGG_EXPORT voter: public account {
-    friend class client;
-    
     inline voter(const dpp::json& j): account(j) {}
+  
+    friend class client;
   };
 
   class TOPGG_EXPORT bot: public account {
-    friend class client;
-    
     bot(const dpp::json& j);
     
   public:
-    std::string_view discriminator;
-    std::string_view prefix;
-    std::string_view short_description;
-    std::optional<std::string_view> long_description;
-    std::vector<std::string_view> tags;
-    std::optional<std::string_view> website;
-    std::optional<std::string_view> github;
+    std::string discriminator;
+    std::string prefix;
+    std::string short_description;
+    std::optional<std::string> long_description;
+    std::vector<std::string> tags;
+    std::optional<std::string> website;
+    std::optional<std::string> github;
     std::vector<dpp::snowflake> owners;
     std::vector<size_t> guilds;
-    std::optional<std::string_view> banner;
+    std::optional<std::string> banner;
     time_t approved_at;
     bool is_certified;
     std::vector<size_t> shards;
@@ -80,6 +78,8 @@ namespace topgg {
     size_t shard_count;
     std::string invite;
     std::string url;
+  
+    friend class client;
   };
   
   namespace autoposter {
@@ -87,9 +87,6 @@ namespace topgg {
   };
   
   class TOPGG_EXPORT stats {
-    friend class client;
-    friend class autoposter::base;
-  
     stats(const dpp::json& j);
   
     std::optional<size_t> m_shard_count;
@@ -112,37 +109,40 @@ namespace topgg {
     inline void set_server_count(const size_t new_server_count) noexcept {
       m_server_count = std::optional{new_server_count};
     }
+    
+    friend class client;
+    friend class autoposter::base;
   };
   
   class user;
 
   class TOPGG_EXPORT user_socials {
-    friend class user;
-    
     user_socials(const dpp::json& j);
     
   public:
-    std::optional<std::string_view> github;
-    std::optional<std::string_view> instagram;
-    std::optional<std::string_view> reddit;
-    std::optional<std::string_view> twitter;
-    std::optional<std::string_view> youtube;
+    std::optional<std::string> github;
+    std::optional<std::string> instagram;
+    std::optional<std::string> reddit;
+    std::optional<std::string> twitter;
+    std::optional<std::string> youtube;
+  
+    friend class user;
   };
   
   class TOPGG_EXPORT user: public account {
-    friend class client;
-    
     user(const dpp::json& j);
     
   public:
-    std::optional<std::string_view> bio;
-    std::optional<std::string_view> banner;
+    std::optional<std::string> bio;
+    std::optional<std::string> banner;
     std::optional<user_socials> socials;
     bool is_supporter;
     bool is_certified_dev;
     bool is_moderator;
     bool is_web_moderator;
     bool is_admin;
+    
+    friend class client;
   };
 };
 
