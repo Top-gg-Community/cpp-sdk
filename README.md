@@ -13,8 +13,7 @@ dpkg -i dpp.deb
 
 # build topgg
 cmake -B build .
-cd build
-make
+cmake --build build --config Release
 ```
 
 Linux (CentOS-like):
@@ -27,8 +26,7 @@ yum localinstall dpp.rpm
 
 # build topgg
 cmake -B build .
-cd build
-make
+cmake --build build --config Release
 ```
 
 OSX:
@@ -40,15 +38,14 @@ brew link libdpp
 
 # build topgg
 cmake -B build .
-cd build
-make
+cmake --build build --config Release
 ```
 
 Windows (Microsoft Visual C++):
 
 ```bat
 cmake -B build .
-msbuild build/topgg.sln -noLogo -p:Configuration=Release
+cmake --build build --config Release
 ```
 
 ## Examples
