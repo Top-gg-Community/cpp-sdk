@@ -41,7 +41,7 @@ cmake -B build .
 cmake --build build --config Release
 ```
 
-Windows (Microsoft Visual C++):
+Windows:
 
 ```bat
 cmake -B build .
