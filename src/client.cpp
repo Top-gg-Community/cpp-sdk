@@ -9,13 +9,6 @@ client::client(dpp::cluster* cluster, const std::string& token): m_cluster(clust
   m_headers.insert(std::pair("User-Agent", "topgg (https://github.com/top-gg-community/cpp-sdk) D++"));
 }
 
-template<typename T>
-void client::basic_request(const std::string& url, std::function<void(const result<T>&)> callback, std::function<T(const dpp::json&)> conversion_fn) {
-  m_cluster->request("https://top.gg/api" + url, dpp::m_get, [callback, conversion_fn](const auto& response) {
-    callback(result<T>{response, conversion_fn});
-  }, "", "application/json", m_headers);
-}
-
 void client::get_bot(const dpp::snowflake& bot_id, topgg::get_bot_completion_t callback) {
   basic_request<topgg::bot>("/bots/" + std::to_string(bot_id), callback, [](const auto& j) {
     return topgg::bot{j};

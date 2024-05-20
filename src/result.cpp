@@ -63,24 +63,24 @@ static const char* get_dpp_error_message(const dpp::http_error& http_error) {
 
 void result_internal::prepare() const {
   if (m_response.error != dpp::h_success) {
-    throw internal_client_error(m_response.error, get_dpp_error_message(m_response.error));
+    throw internal_client_error{m_response.error, get_dpp_error_message(m_response.error)};
   } else if (m_response.status >= 400) {
     switch (m_response.status) {
     case 401:
-      throw invalid_token();
+      throw invalid_token{};
     
     case 404:
-      throw not_found();
+      throw not_found{};
     
     case 429: {
       const auto j = json::parse(m_response.body);
       const auto retry_after = j["retry_after"].template get<uint16_t>();
       
-      throw ratelimited(retry_after);
+      throw ratelimited{retry_after};
     }
     
     default:
-      throw internal_server_error();
+      throw internal_server_error{};
     }
   }
 }

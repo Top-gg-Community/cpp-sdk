@@ -9,15 +9,15 @@ using topgg::stats;
 
 void killable_semaphore::release() {
   std::lock_guard<std::mutex> lock{m_mutex};
-  
+
   ++m_count;
-  m_condition.notify_one();
+  m_condition.notify_all();
 }
 
 bool killable_semaphore::acquire() {
   std::unique_lock<std::mutex> lock{m_mutex};
   
-  while (!m_count || !m_killed) {
+  while (m_count == 0 && !m_killed) {
     m_condition.wait(lock);
   }
   
@@ -29,47 +29,31 @@ void killable_semaphore::kill() {
   std::lock_guard<std::mutex> lock{m_mutex};
   
   m_killed = true;
-  m_condition.notify_one();
+  m_condition.notify_all();
 }
 
 void killable_waiter::kill() {
   std::lock_guard<std::mutex> lock{m_mutex};
 
   m_killed = true;
-  m_condition.notify_one();
+  m_condition.notify_all();
 }
 
-template<class R, class P>
-bool killable_waiter::wait(const std::chrono::duration<R, P>& delay) {
-  std::unique_lock<std::mutex> lock{m_mutex};
+void base::thread_loop(base* self, dpp::cluster* thread_cluster, const std::string& token) {
+  const auto s = self->get_stats(thread_cluster);
   
-  m_condition.wait_for(lock, delay, [this]() -> bool { return this->m_killed; });
+  self->after_fetch();
   
-  return !m_killed;
-}
-
-template<class R, class P>
-base::base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay): m_cluster(std::shared_ptr{cluster}) {
-  m_thread = std::thread([this, token, delay]() {
-    std::shared_ptr<dpp::cluster> thread_cluster{this->m_cluster};
-
-    while (this->m_waiter.wait(delay) && this->before_fetch()) {
-      const auto s = this->get_stats(thread_cluster.get());
-      
-      this->after_fetch();
-      
-      const auto s_json = s.to_json();
-      const std::multimap<std::string, std::string> headers = {
-        {"Authorization", "Bearer " + token},
-        {"Connection", "close"},
-        {"Content-Type", "application/json"},
-        {"Content-Length", std::to_string(s_json.size())},
-        {"User-Agent", "topgg (https://github.com/top-gg-community/cpp-sdk) D++"}
-      };
-      
-      thread_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [](TOPGG_UNUSED const auto& _) {}, s_json, "application/json", headers);
-    }
-  });
+  const auto s_json = s.to_json();
+  const std::multimap<std::string, std::string> headers = {
+    {"Authorization", "Bearer " + token},
+    {"Connection", "close"},
+    {"Content-Type", "application/json"},
+    {"Content-Length", std::to_string(s_json.size())},
+    {"User-Agent", "topgg (https://github.com/top-gg-community/cpp-sdk) D++"}
+  };
+  
+  thread_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [](TOPGG_UNUSED const auto& _) {}, s_json, "application/json", headers);
 }
 
 void base::stop() {
@@ -81,19 +65,16 @@ base::~base() {
   m_thread.join();
 }
 
-template<class R, class P>
-cached::cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay): base(cluster, token, delay), m_semaphore(killable_semaphore{0}) {
+void cached::start_listening() {
   auto this_cluster = m_cluster.get();
-  
-  if (delay < std::chrono::minutes(15)) {
-    throw std::invalid_argument("Delay can't be shorter than 15 minutes.");
-  }
   
   this_cluster->on_ready([this](const auto& event) {
     if (dpp::run_once<struct _>()) {
       this->m_mutex.lock();
       
-      this->m_guilds = event.guilds;
+      for (const auto& guild: event.guilds) {
+        this->m_guilds.insert(guild);
+      }
       
       this->m_mutex.unlock();
       this->m_semaphore.release();

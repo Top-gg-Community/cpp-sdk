@@ -18,7 +18,7 @@ namespace topgg {
       size_t m_count;
       bool m_killed;
 
-      inline killable_semaphore(const size_t count): m_count(count) {}
+      inline killable_semaphore(const size_t count): m_count(count), m_killed(false) {}
       
       void release();
       bool acquire();
@@ -40,7 +40,14 @@ namespace topgg {
       inline killable_waiter(): m_killed(false) {}
       
       template<class R, class P>
-      bool wait(const std::chrono::duration<R, P>& delay);
+      bool wait(const std::chrono::duration<R, P>& delay) {
+        std::unique_lock<std::mutex> lock{m_mutex};
+
+        m_condition.wait_for(lock, delay, [this]() -> bool { return this->m_killed; });
+
+        return !m_killed;
+      }
+      
       void kill();
       
       friend class base;
@@ -56,12 +63,21 @@ namespace topgg {
       
       virtual inline void after_fetch() {}
       virtual ::topgg::stats get_stats(dpp::cluster* bot) = 0;
+      static void thread_loop(base* self, dpp::cluster* thread_cluster, const std::string& token);
       
     protected:
       std::shared_ptr<dpp::cluster> m_cluster;
       
       template<class R, class P>
-      base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay);
+      base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay): m_cluster(std::shared_ptr{cluster}) {
+        m_thread = std::thread([this, token, delay]() {
+          std::shared_ptr<dpp::cluster> thread_cluster{this->m_cluster};
+        
+          while (this->m_waiter.wait(delay) && this->before_fetch()) {
+            base::thread_loop(this, thread_cluster.get(), token);
+          }
+        });
+      }
     public:
       virtual void stop();
       
@@ -77,6 +93,7 @@ namespace topgg {
       inline void after_fetch() override {
         m_mutex.unlock();
       }
+      void start_listening();
       
       inline ::topgg::stats get_stats(TOPGG_UNUSED dpp::cluster* _) override {
         return ::topgg::stats{m_guilds.size()};
@@ -84,7 +101,13 @@ namespace topgg {
       
     public:
       template<class R, class P>
-      cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay);
+      cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay): base(cluster, token, delay), m_semaphore(killable_semaphore{0}) {
+        if (delay < std::chrono::seconds(15)) {
+          throw std::invalid_argument{"Delay can't be shorter than 15 minutes."};
+        }
+        
+        start_listening();
+      }
     
       void stop() override;
     };

@@ -25,7 +25,11 @@ namespace topgg {
     std::multimap<std::string, std::string> m_headers;
     
     template<typename T>
-    void basic_request(const std::string& url, std::function<void(const result<T>&)> callback, std::function<T(const dpp::json&)> conversion_fn);
+    void basic_request(const std::string& url, std::function<void(const result<T>&)> callback, std::function<T(const dpp::json&)> conversion_fn) {
+      m_cluster->request("https://top.gg/api" + url, dpp::m_get, [callback, conversion_fn](const auto& response) {
+        callback(result<T>{response, conversion_fn});
+      }, "", "application/json", m_headers);
+    }
   public:
     client(dpp::cluster* cluster, const std::string& token);
     
