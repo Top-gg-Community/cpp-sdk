@@ -102,7 +102,7 @@ namespace topgg {
     public:
       template<class R, class P>
       cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay): base(cluster, token, delay), m_semaphore(killable_semaphore{0}) {
-        if (delay < std::chrono::seconds(15)) {
+        if (delay < std::chrono::minutes(15)) {
           throw std::invalid_argument{"Delay can't be shorter than 15 minutes."};
         }
         
