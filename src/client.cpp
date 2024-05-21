@@ -2,7 +2,8 @@
 
 using topgg::client;
 
-client::client(dpp::cluster* cluster, const std::string& token): m_cluster(cluster) {
+client::client(dpp::cluster* cluster, const std::string& token)
+  : m_cluster(cluster) {
   m_headers.insert(std::pair("Authorization", "Bearer " + token));
   m_headers.insert(std::pair("Connection", "close"));
   m_headers.insert(std::pair("Content-Type", "application/json"));
@@ -24,12 +25,10 @@ void client::get_user(const dpp::snowflake& user_id, topgg::get_user_completion_
 void client::post_stats(const stats& s, topgg::post_stats_completion_t callback) {
   auto headers = std::multimap<std::string, std::string>{m_headers};
   const auto s_json = s.to_json();
-  
+
   headers.insert(std::pair("Content-Length", std::to_string(s_json.size())));
-  
-  m_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [callback](TOPGG_UNUSED const auto& _) {
-    callback();
-  }, s_json, "application/json", headers);
+
+  m_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [callback](TOPGG_UNUSED const auto& _) { callback(); }, s_json, "application/json", headers);
 }
 
 void client::get_stats(topgg::get_stats_completion_t callback) {
@@ -41,11 +40,11 @@ void client::get_stats(topgg::get_stats_completion_t callback) {
 void client::get_voters(topgg::get_voters_completion_t callback) {
   basic_request<std::vector<topgg::voter>>("/bots/votes", callback, [](const auto& j) {
     std::vector<topgg::voter> voters;
-    
+
     for (const auto& part: j) {
       voters.push_back(topgg::voter{part});
     }
-    
+
     return voters;
   });
 }

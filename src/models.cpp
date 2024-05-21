@@ -1,10 +1,10 @@
 #include <topgg/topgg.h>
 
-using topgg::user_socials;
 using topgg::account;
+using topgg::bot;
 using topgg::stats;
 using topgg::user;
-using topgg::bot;
+using topgg::user_socials;
 
 #ifdef _WIN32
 #include <sstream>
@@ -80,9 +80,9 @@ static void strptime(const char* s, const char* f, tm* t) {
 
 account::account(const dpp::json& j) {
   id = dpp::snowflake{j["id"].template get<std::string>()};
-  
+
   DESERIALIZE(j, username, std::string);
-  
+
   try {
     const auto hash = j["avatar"].template get<std::string>();
     const char* ext = hash.rfind("a_", 0) == 0 ? "gif" : "png";
@@ -91,11 +91,12 @@ account::account(const dpp::json& j) {
   } catch (TOPGG_UNUSED const std::exception& _) {
     avatar = "https://cdn.discordapp.com/embed/avatars/" + std::to_string((id >> 22) % 5) + ".png";
   }
-  
+
   created_at = static_cast<time_t>(((id >> 22) / 1000) + 1420070400);
 }
 
-bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
+bot::bot(const dpp::json& j)
+  : account(j), url("https://top.gg/bot/") {
   DESERIALIZE(j, discriminator, std::string);
   DESERIALIZE(j, prefix, std::string);
   DESERIALIZE_ALIAS(j, shortdesc, short_description, std::string);
@@ -103,26 +104,26 @@ bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
   DESERIALIZE_VECTOR(j, tags, std::string);
   DESERIALIZE_OPTIONAL_STRING(j, website);
   DESERIALIZE_OPTIONAL_STRING(j, github);
-  
+
   IGNORE_EXCEPTION({
     const auto j_owners = j["owners"].template get<std::vector<std::string>>();
-    
+
     owners.reserve(j_owners.size());
-    
+
     for (const auto& owner: j_owners) {
       owners.push_back(dpp::snowflake{owner});
     }
   });
-  
+
   DESERIALIZE_VECTOR(j, guilds, size_t);
   DESERIALIZE_OPTIONAL_STRING_ALIAS(j, bannerUrl, banner);
 
   const auto j_approved_at = j["date"].template get<std::string>();
   tm approved_at_tm;
-  
+
   strptime(j_approved_at.data(), "%Y-%m-%dT%H:%M:%S", &approved_at_tm);
   approved_at = mktime(&approved_at_tm);
-  
+
   DESERIALIZE_ALIAS(j, certifiedBot, is_certified, bool);
   DESERIALIZE_VECTOR(j, shards, size_t);
   DESERIALIZE_ALIAS(j, points, votes, size_t);
@@ -133,21 +134,21 @@ bot::bot(const dpp::json& j): account(j), url("https://top.gg/bot/") {
   } catch (TOPGG_UNUSED const std::exception& _) {
     invite = "https://discord.com/oauth2/authorize?scope=bot&client_id=" + std::to_string(id);
   }
-  
+
   IGNORE_EXCEPTION({
     const auto j_support = j["support"].template get<std::string>();
-    
+
     if (j_support.size() > 0) {
       support = std::optional{"https://discord.com/invite/" + j_support};
     }
   });
-  
+
   try {
     DESERIALIZE(j, shard_count, size_t);
   } catch (TOPGG_UNUSED const std::exception& _) {
     shard_count = shards.size();
   }
-  
+
   try {
     url.append(j["vanity"].template get<std::string>());
   } catch (TOPGG_UNUSED const std::exception& _) {
@@ -162,23 +163,24 @@ stats::stats(const dpp::json& j) {
   DESERIALIZE_PRIVATE_OPTIONAL(j, shard_id, size_t);
 }
 
-stats::stats(const std::vector<size_t>& shards, const size_t shard_index): m_shards(std::optional{shards}), m_server_count(std::optional{std::reduce(shards.begin(), shards.end())}) {
+stats::stats(const std::vector<size_t>& shards, const size_t shard_index)
+  : m_shards(std::optional{shards}), m_server_count(std::optional{std::reduce(shards.begin(), shards.end())}) {
   if (shard_index >= shards.size()) {
     throw std::out_of_range{"Shard index out of bounds from the given shards array."};
   }
-  
+
   m_shard_id = std::optional{shard_index};
   m_shard_count = std::optional{shards.size()};
 }
 
 std::string stats::to_json() const {
   dpp::json j;
-  
+
   SERIALIZE_PRIVATE_OPTIONAL(j, shard_count);
   SERIALIZE_PRIVATE_OPTIONAL(j, server_count);
   SERIALIZE_PRIVATE_OPTIONAL(j, shards);
   SERIALIZE_PRIVATE_OPTIONAL(j, shard_id);
-  
+
   return j.dump();
 }
 
@@ -214,14 +216,15 @@ user_socials::user_socials(const dpp::json& j) {
   DESERIALIZE_OPTIONAL_STRING(j, youtube);
 }
 
-user::user(const dpp::json& j): account(j) {
+user::user(const dpp::json& j)
+  : account(j) {
   DESERIALIZE_OPTIONAL_STRING(j, bio);
   DESERIALIZE_OPTIONAL_STRING(j, banner);
-  
+
   if (j.contains("contains")) {
     socials = std::optional{user_socials{j["socials"].template get<dpp::json>()}};
   }
-  
+
   DESERIALIZE_ALIAS(j, supporter, is_supporter, bool);
   DESERIALIZE_ALIAS(j, certifiedDev, is_certified_dev, bool);
   DESERIALIZE_ALIAS(j, mod, is_moderator, bool);

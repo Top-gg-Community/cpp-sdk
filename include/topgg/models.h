@@ -35,7 +35,7 @@ namespace topgg {
 
 #define TOPGG_MODEL_PROPERTY_REF(type, name) \
   TOPGG_MODEL_PROPERTY_REF_VIS(private, type, name)
-  
+
   class TOPGG_EXPORT account {
   protected:
     account(const dpp::json& j);
@@ -46,18 +46,19 @@ namespace topgg {
     std::string username;
     time_t created_at;
   };
-  
+
   class client;
-  
+
   class TOPGG_EXPORT voter: public account {
-    inline voter(const dpp::json& j): account(j) {}
-  
+    inline voter(const dpp::json& j)
+      : account(j) {}
+
     friend class client;
   };
 
   class TOPGG_EXPORT bot: public account {
     bot(const dpp::json& j);
-    
+
   public:
     std::string discriminator;
     std::string prefix;
@@ -78,60 +79,63 @@ namespace topgg {
     size_t shard_count;
     std::string invite;
     std::string url;
-  
+
     friend class client;
   };
-  
+
   namespace autoposter {
     class base;
-  };
-  
+  }; // namespace autoposter
+
   class TOPGG_EXPORT stats {
     stats(const dpp::json& j);
-  
+
     std::optional<size_t> m_shard_count;
     std::optional<std::vector<size_t>> m_shards;
     std::optional<size_t> m_shard_id;
     std::optional<size_t> m_server_count;
-  
+
     std::string to_json() const;
-  
+
   public:
-    inline stats(const size_t server_count): m_server_count(std::optional{server_count}) {}
-    inline stats(const size_t server_count, const size_t shard_count): m_shard_count(std::optional{shard_count}), m_server_count(std::optional{server_count}) {}
-    
+    inline stats(const size_t server_count)
+      : m_server_count(std::optional{server_count}) {}
+
+    inline stats(const size_t server_count, const size_t shard_count)
+      : m_shard_count(std::optional{shard_count}), m_server_count(std::optional{server_count}) {}
+
     stats(const std::vector<size_t>& shards, const size_t shard_index);
-    
+
     std::vector<size_t> shards() const noexcept;
     size_t shard_count() const noexcept;
     std::optional<size_t> server_count() const noexcept;
-    
+
     inline void set_server_count(const size_t new_server_count) noexcept {
       m_server_count = std::optional{new_server_count};
     }
-    
+
     friend class client;
     friend class autoposter::base;
   };
-  
+
   class user;
 
   class TOPGG_EXPORT user_socials {
     user_socials(const dpp::json& j);
-    
+
   public:
     std::optional<std::string> github;
     std::optional<std::string> instagram;
     std::optional<std::string> reddit;
     std::optional<std::string> twitter;
     std::optional<std::string> youtube;
-  
+
     friend class user;
   };
-  
+
   class TOPGG_EXPORT user: public account {
     user(const dpp::json& j);
-    
+
   public:
     std::optional<std::string> bio;
     std::optional<std::string> banner;
@@ -141,10 +145,10 @@ namespace topgg {
     bool is_moderator;
     bool is_web_moderator;
     bool is_admin;
-    
+
     friend class client;
   };
-};
+}; // namespace topgg
 
 #undef TOPGG_MODEL_PROPERTY_VIS
 #undef TOPGG_MODEL_PROPERTY
