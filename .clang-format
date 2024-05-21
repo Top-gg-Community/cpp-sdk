@@ -87,7 +87,6 @@ IntegerLiteralSeparator:
 KeepEmptyLinesAtEOF: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
-LambdaBodyIndentation: Signature
 LineEnding: LF
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
