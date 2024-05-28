@@ -8,6 +8,12 @@
 #include <memory>
 #include <mutex>
 
+#define TOPGG_NO_COPYING(name)                      \
+  name(const name& other) = delete;                 \
+  name(name&& other) = delete;                      \
+  name& operator=(const name& other) & = delete;    \
+  name& operator=(name&& other) & = delete
+
 namespace topgg {
   namespace autoposter {
     class cached;
@@ -25,10 +31,11 @@ namespace topgg {
       bool acquire();
       void kill();
 
-      friend class cached;
-
     public:
       killable_semaphore() = delete;
+      TOPGG_NO_COPYING(killable_semaphore);
+    
+      friend class cached;
     };
 
     class base;
@@ -52,7 +59,9 @@ namespace topgg {
       }
 
       void kill();
-
+    public:
+      TOPGG_NO_COPYING(killable_waiter);
+    
       friend class base;
     };
 
@@ -92,6 +101,8 @@ namespace topgg {
 
     public:
       base() = delete;
+      TOPGG_NO_COPYING(base);
+      
       virtual void stop();
 
       ~base();
@@ -122,10 +133,7 @@ namespace topgg {
       }
 
       cached() = delete;
-      cached(const cached& other) = delete;
-      cached(cached&& other) = delete;
-      cached& operator=(const cached& other) & = delete;
-      cached& operator=(cached&& other) & = delete;
+      TOPGG_NO_COPYING(cached);
 
       void stop() override;
     };
@@ -143,10 +151,9 @@ namespace topgg {
         : base(cluster, token, delay), m_callback(callback) {}
 
       custom() = delete;
-      custom(const custom& other) = delete;
-      custom(custom&& other) = delete;
-      custom& operator=(const custom& other) & = delete;
-      custom& operator=(custom&& other) & = delete;
+      TOPGG_NO_COPYING(custom);
     };
   }; // namespace autoposter
 }; // namespace topgg
+
+#undef TOPGG_NO_COPYING

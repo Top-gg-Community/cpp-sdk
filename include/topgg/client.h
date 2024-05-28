@@ -7,7 +7,6 @@
 #include <string>
 #include <map>
 
-namespace topgg {
 #define TOPGG_API_CALLBACK(return_type, name) \
   using name##_completion_t = std::function<void(const result<return_type>&)>
 
@@ -17,6 +16,7 @@ namespace topgg {
 #define TOPGG_API_ENDPOINT_ARGS(name, ...) \
   void name(__VA_ARGS__, const name##_completion_t& callback)
 
+namespace topgg {
   TOPGG_API_CALLBACK(bot, get_bot);
   TOPGG_API_CALLBACK(user, get_user);
   TOPGG_API_CALLBACK(stats, get_stats);
