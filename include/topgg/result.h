@@ -27,6 +27,8 @@ namespace topgg {
       : std::runtime_error("This client is ratelimited from further requests. Please try again later."), m_retry_after(retry_after) {}
 
   public:
+    ratelimited() = delete;
+
     inline constexpr uint16_t retry_after() const noexcept {
       return m_retry_after;
     }
@@ -41,6 +43,8 @@ namespace topgg {
       : std::runtime_error(message), m_http_error(http_error) {}
 
   public:
+    internal_client_error() = delete;
+
     inline constexpr const dpp::http_error& get_http_error() const noexcept {
       return m_http_error;
     }
@@ -72,6 +76,8 @@ namespace topgg {
       : result_internal(response), m_parse_fn(parse_fn) {}
 
   public:
+    result() = delete;
+
     T get() const {
       result_internal::prepare();
 

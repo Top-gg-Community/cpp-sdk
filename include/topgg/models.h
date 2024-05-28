@@ -41,6 +41,8 @@ namespace topgg {
     account(const dpp::json& j);
 
   public:
+    account() = delete;
+
     dpp::snowflake id;
     std::string avatar;
     std::string username;
@@ -53,6 +55,9 @@ namespace topgg {
     inline voter(const dpp::json& j)
       : account(j) {}
 
+  public:
+    voter() = delete;
+
     friend class client;
   };
 
@@ -60,6 +65,8 @@ namespace topgg {
     bot(const dpp::json& j);
 
   public:
+    bot() = delete;
+
     std::string discriminator;
     std::string prefix;
     std::string short_description;
@@ -98,6 +105,8 @@ namespace topgg {
     std::string to_json() const;
 
   public:
+    stats() = delete;
+
     inline stats(const size_t server_count)
       : m_server_count(std::optional{server_count}) {}
 
@@ -124,6 +133,8 @@ namespace topgg {
     user_socials(const dpp::json& j);
 
   public:
+    user_socials() = delete;
+
     std::optional<std::string> github;
     std::optional<std::string> instagram;
     std::optional<std::string> reddit;
@@ -137,6 +148,8 @@ namespace topgg {
     user(const dpp::json& j);
 
   public:
+    user() = delete;
+
     std::optional<std::string> bio;
     std::optional<std::string> banner;
     std::optional<user_socials> socials;

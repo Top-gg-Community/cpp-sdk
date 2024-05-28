@@ -85,6 +85,7 @@ namespace topgg {
       }
 
     public:
+      base() = delete;
       virtual void stop();
 
       ~base();
@@ -118,6 +119,12 @@ namespace topgg {
         start_listening();
       }
 
+      cached() = delete;
+      cached(const cached& other) = delete;
+      cached(cached&& other) = delete;
+      cached& operator=(const cached& other) & = delete;
+      cached& operator=(cached&& other) & = delete;
+
       void stop() override;
     };
 
@@ -131,7 +138,13 @@ namespace topgg {
     public:
       template<class R, class P>
       inline custom(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay, std::function<::topgg::stats(dpp::cluster*)> callback)
-        : base(cluster, token, delay), m_callback(callback) {}
+        : base(cluster, token, delay), m_callback(std::forward(callback)) {}
+
+      custom() = delete;
+      custom(const custom& other) = delete;
+      custom(custom&& other) = delete;
+      custom& operator=(const custom& other) & = delete;
+      custom& operator=(custom&& other) & = delete;
     };
   }; // namespace autoposter
 }; // namespace topgg

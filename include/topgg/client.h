@@ -30,6 +30,7 @@ namespace topgg {
     }
 
   public:
+    client() = delete;
     client(dpp::cluster* cluster, const std::string& token);
 
     void get_bot(const dpp::snowflake& bot_id, get_bot_completion_t callback);
