@@ -77,7 +77,7 @@ namespace topgg {
       virtual inline void after_fetch() {}
 
       virtual ::topgg::stats get_stats(dpp::cluster* bot) = 0;
-      static void thread_loop(base* self, dpp::cluster* thread_cluster);
+      void thread_loop(dpp::cluster* thread_cluster);
 
     protected:
       std::shared_ptr<dpp::cluster> m_cluster;
@@ -94,7 +94,7 @@ namespace topgg {
           std::shared_ptr<dpp::cluster> thread_cluster{this->m_cluster};
 
           while (this->m_waiter.wait(t_delay) && this->before_fetch()) {
-            base::thread_loop(this, thread_cluster.get());
+            this->thread_loop(thread_cluster.get());
           }
         }, std::cref(delay));
         // clang-format on

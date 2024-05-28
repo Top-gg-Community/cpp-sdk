@@ -39,13 +39,13 @@ void killable_waiter::kill() {
   m_condition.notify_all();
 }
 
-void base::thread_loop(base* self, dpp::cluster* thread_cluster) {
-  const auto s = self->get_stats(thread_cluster);
+void base::thread_loop(dpp::cluster* thread_cluster) {
+  const auto s = get_stats(thread_cluster);
 
-  self->after_fetch();
+  after_fetch();
 
   const auto s_json = s.to_json();
-  std::multimap<std::string, std::string> headers{self->m_headers};
+  std::multimap<std::string, std::string> headers{m_headers};
 
   headers.insert(std::pair("Content-Length", std::to_string(s_json.size())));
 
