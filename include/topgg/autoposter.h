@@ -34,7 +34,7 @@ namespace topgg {
     public:
       killable_semaphore() = delete;
       TOPGG_NO_COPYING(killable_semaphore);
-    
+
       friend class cached;
     };
 
@@ -59,9 +59,10 @@ namespace topgg {
       }
 
       void kill();
+
     public:
       TOPGG_NO_COPYING(killable_waiter);
-    
+
       friend class base;
     };
 
@@ -102,7 +103,7 @@ namespace topgg {
     public:
       base() = delete;
       TOPGG_NO_COPYING(base);
-      
+
       virtual void stop();
 
       ~base();
