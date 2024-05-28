@@ -56,10 +56,9 @@ namespace topgg {
       friend class base;
     };
 
-    class TOPGG_EXPORT base {
+    class TOPGG_EXPORT base: private ::topgg::base_client {
       killable_waiter m_waiter;
       std::thread m_thread;
-      std::multimap<std::string, std::string> m_headers;
 
       virtual inline bool before_fetch() {
         return true;
@@ -75,21 +74,20 @@ namespace topgg {
 
       template<class R, class P>
       base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay)
-        : m_cluster(std::shared_ptr{cluster}) {
+        : ::topgg::base_client(token), m_cluster(std::shared_ptr{cluster}) {
         if (delay < std::chrono::minutes(15)) {
           throw std::invalid_argument{"Delay can't be shorter than 15 minutes."};
         }
 
-        client::setup_headers(m_headers, token);
-
+        // clang-format off
         m_thread = std::thread([this](const std::chrono::duration<R, P>& t_delay) {
           std::shared_ptr<dpp::cluster> thread_cluster{this->m_cluster};
 
           while (this->m_waiter.wait(t_delay) && this->before_fetch()) {
             base::thread_loop(this, thread_cluster.get());
           }
-        },
-                               std::cref(delay));
+        }, std::cref(delay));
+        // clang-format on
       }
 
     public:

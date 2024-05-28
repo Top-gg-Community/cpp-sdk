@@ -26,15 +26,18 @@ namespace topgg {
 
   using post_stats_completion_t = std::function<void(void)>;
 
-  namespace autoposter {
-    class base;
-  }; // namespace autoposter
-
-  class TOPGG_EXPORT client {
-    dpp::cluster* m_cluster;
+  class TOPGG_EXPORT base_client {
+  protected:
     std::multimap<std::string, std::string> m_headers;
 
-    static void setup_headers(std::multimap<std::string, std::string>& headers, const std::string& token);
+    base_client(const std::string& token);
+
+  public:
+    base_client() = delete;
+  };
+
+  class TOPGG_EXPORT client: private base_client {
+    dpp::cluster* m_cluster;
 
     template<typename T>
     void basic_request(const std::string& url, const std::function<void(const result<T>&)>& callback, const std::function<T(const dpp::json&)>& conversion_fn) {
@@ -43,7 +46,9 @@ namespace topgg {
 
   public:
     client() = delete;
-    client(dpp::cluster* cluster, const std::string& token);
+
+    inline client(dpp::cluster* cluster, const std::string& token)
+      : base_client(token), m_cluster(cluster) {}
 
     TOPGG_API_ENDPOINT_ARGS(get_bot, const dpp::snowflake& bot_id);
     TOPGG_API_ENDPOINT_ARGS(get_user, const dpp::snowflake& user_id);

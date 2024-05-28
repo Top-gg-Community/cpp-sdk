@@ -1,17 +1,13 @@
 #include <topgg/topgg.h>
 
+using topgg::base_client;
 using topgg::client;
 
-void client::setup_headers(std::multimap<std::string, std::string>& headers, const std::string& token) {
-  headers.insert(std::pair("Authorization", "Bearer " + token));
-  headers.insert(std::pair("Connection", "close"));
-  headers.insert(std::pair("Content-Type", "application/json"));
-  headers.insert(std::pair("User-Agent", "topgg (https://github.com/top-gg-community/cpp-sdk) D++"));
-}
-
-client::client(dpp::cluster* cluster, const std::string& token)
-  : m_cluster(cluster) {
-  client::setup_headers(m_headers, token);
+base_client::base_client(const std::string& token) {
+  m_headers.insert(std::pair("Authorization", "Bearer " + token));
+  m_headers.insert(std::pair("Connection", "close"));
+  m_headers.insert(std::pair("Content-Type", "application/json"));
+  m_headers.insert(std::pair("User-Agent", "topgg (https://github.com/top-gg-community/cpp-sdk) D++"));
 }
 
 #define TOPGG_API_ENDPOINT(name) \
