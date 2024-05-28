@@ -61,7 +61,7 @@ namespace topgg {
 
     void prepare() const;
 
-    inline result_internal(dpp::http_request_completion_t response)
+    inline result_internal(const dpp::http_request_completion_t& response)
       : m_response(response) {}
 
   public:
@@ -72,7 +72,7 @@ namespace topgg {
   class TOPGG_EXPORT result: private result_internal {
     const std::function<T(dpp::json& json)> m_parse_fn;
 
-    inline result(dpp::http_request_completion_t response, std::function<T(const dpp::json& json)> parse_fn)
+    inline result(const dpp::http_request_completion_t& response, const std::function<T(const dpp::json&)>& parse_fn)
       : result_internal(response), m_parse_fn(parse_fn) {}
 
   public:

@@ -39,19 +39,15 @@ void killable_waiter::kill() {
   m_condition.notify_all();
 }
 
-void base::thread_loop(base* self, dpp::cluster* thread_cluster, const std::string& token) {
+void base::thread_loop(base* self, dpp::cluster* thread_cluster) {
   const auto s = self->get_stats(thread_cluster);
 
   self->after_fetch();
 
   const auto s_json = s.to_json();
-  const std::multimap<std::string, std::string> headers = {
-    {"Authorization",  "Bearer " + token                                        },
-    {"Connection",     "close"                                                  },
-    {"Content-Type",   "application/json"                                       },
-    {"Content-Length", std::to_string(s_json.size())                            },
-    {"User-Agent",     "topgg (https://github.com/top-gg-community/cpp-sdk) D++"}
-  };
+  std::multimap<std::string, std::string> headers{self->m_headers};
+
+  headers.insert(std::pair("Content-Length", std::to_string(s_json.size())));
 
   thread_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [](TOPGG_UNUSED const auto& _) {}, s_json, "application/json", headers);
 }

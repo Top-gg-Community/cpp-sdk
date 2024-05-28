@@ -59,6 +59,7 @@ namespace topgg {
     class TOPGG_EXPORT base {
       killable_waiter m_waiter;
       std::thread m_thread;
+      std::multimap<std::string, std::string> m_headers;
 
       virtual inline bool before_fetch() {
         return true;
@@ -67,7 +68,7 @@ namespace topgg {
       virtual inline void after_fetch() {}
 
       virtual ::topgg::stats get_stats(dpp::cluster* bot) = 0;
-      static void thread_loop(base* self, dpp::cluster* thread_cluster, const std::string& token);
+      static void thread_loop(base* self, dpp::cluster* thread_cluster);
 
     protected:
       std::shared_ptr<dpp::cluster> m_cluster;
@@ -75,13 +76,20 @@ namespace topgg {
       template<class R, class P>
       base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay)
         : m_cluster(std::shared_ptr{cluster}) {
-        m_thread = std::thread([this, token, delay]() {
+        if (delay < std::chrono::minutes(15)) {
+          throw std::invalid_argument{"Delay can't be shorter than 15 minutes."};
+        }
+
+        client::setup_headers(m_headers, token);
+
+        m_thread = std::thread([this](const std::chrono::duration<R, P>& t_delay) {
           std::shared_ptr<dpp::cluster> thread_cluster{this->m_cluster};
 
-          while (this->m_waiter.wait(delay) && this->before_fetch()) {
-            base::thread_loop(this, thread_cluster.get(), token);
+          while (this->m_waiter.wait(t_delay) && this->before_fetch()) {
+            base::thread_loop(this, thread_cluster.get());
           }
-        });
+        },
+                               std::cref(delay));
       }
 
     public:
@@ -110,12 +118,8 @@ namespace topgg {
 
     public:
       template<class R, class P>
-      cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay)
+      inline cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay)
         : base(cluster, token, delay), m_semaphore(killable_semaphore{0}) {
-        if (delay < std::chrono::minutes(15)) {
-          throw std::invalid_argument{"Delay can't be shorter than 15 minutes."};
-        }
-
         start_listening();
       }
 
@@ -137,8 +141,8 @@ namespace topgg {
 
     public:
       template<class R, class P>
-      inline custom(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay, std::function<::topgg::stats(dpp::cluster*)> callback)
-        : base(cluster, token, delay), m_callback(std::forward(callback)) {}
+      inline custom(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay, std::function<::topgg::stats(dpp::cluster*)>&& callback)
+        : base(cluster, token, delay), m_callback(callback) {}
 
       custom() = delete;
       custom(const custom& other) = delete;
