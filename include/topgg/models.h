@@ -18,24 +18,6 @@
 #endif
 
 namespace topgg {
-#define TOPGG_MODEL_PROPERTY_VIS(visibility, type, name) \
-  visibility: type m_##name;                             \
-  public: inline constexpr type name() const noexcept {  \
-    return m_##name;                                     \
-  }
-
-#define TOPGG_MODEL_PROPERTY(type, name) \
-  TOPGG_MODEL_PROPERTY_VIS(private, type, name)
-
-#define TOPGG_MODEL_PROPERTY_REF_VIS(visibility, type, name) \
-  visibility: type m_##name;                                 \
-  public: inline type const& name() const noexcept {         \
-    return m_##name;                                         \
-  }
-
-#define TOPGG_MODEL_PROPERTY_REF(type, name) \
-  TOPGG_MODEL_PROPERTY_REF_VIS(private, type, name)
-
   class TOPGG_EXPORT account {
   protected:
     account(const dpp::json& j);
@@ -162,8 +144,3 @@ namespace topgg {
     friend class client;
   };
 }; // namespace topgg
-
-#undef TOPGG_MODEL_PROPERTY_VIS
-#undef TOPGG_MODEL_PROPERTY
-#undef TOPGG_MODEL_PROPERTY_REF_VIS
-#undef TOPGG_MODEL_PROPERTY_REF
