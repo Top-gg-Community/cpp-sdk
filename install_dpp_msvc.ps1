@@ -4,7 +4,7 @@ if ((Test-Path "C:\Program Files\Microsoft Visual Studio\2022") -or (Test-Path "
   $vscode_year = "2019"
 }
 
-if ([Environment]::Is64BitProcess) {
+if ([Environment]::Is64BitOperatingSystem) {
   $windows_arch = "win64"
 } else {
   $windows_arch = "win32"
