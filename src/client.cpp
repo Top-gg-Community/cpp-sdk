@@ -16,13 +16,13 @@ base_client::base_client(const std::string& token) {
 #define TOPGG_API_ENDPOINT_ARGS(name, ...) \
   void client::name(__VA_ARGS__, const topgg::name##_completion_t& callback)
 
-TOPGG_API_ENDPOINT_ARGS(get_bot, const dpp::snowflake& bot_id) {
+TOPGG_API_ENDPOINT_ARGS(get_bot, const dpp::snowflake bot_id) {
   basic_request<topgg::bot>("/bots/" + std::to_string(bot_id), callback, [](const auto& j) {
     return topgg::bot{j};
   });
 }
 
-TOPGG_API_ENDPOINT_ARGS(get_user, const dpp::snowflake& user_id) {
+TOPGG_API_ENDPOINT_ARGS(get_user, const dpp::snowflake user_id) {
   basic_request<topgg::user>("/users/" + std::to_string(user_id), callback, [](const auto& j) {
     return topgg::user{j};
   });
@@ -55,7 +55,7 @@ TOPGG_API_ENDPOINT(get_voters) {
   });
 }
 
-TOPGG_API_ENDPOINT_ARGS(has_voted, const dpp::snowflake& user_id) {
+TOPGG_API_ENDPOINT_ARGS(has_voted, const dpp::snowflake user_id) {
   basic_request<bool>("/bots/votes?userId=" + std::to_string(user_id), callback, [](const auto& j) {
     return j["voted"].template get<uint8_t>() != 0;
   });

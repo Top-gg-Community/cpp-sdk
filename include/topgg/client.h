@@ -50,12 +50,12 @@ namespace topgg {
     inline client(dpp::cluster* cluster, const std::string& token)
       : base_client(token), m_cluster(cluster) {}
 
-    TOPGG_API_ENDPOINT_ARGS(get_bot, const dpp::snowflake& bot_id);
-    TOPGG_API_ENDPOINT_ARGS(get_user, const dpp::snowflake& user_id);
+    TOPGG_API_ENDPOINT_ARGS(get_bot, const dpp::snowflake bot_id);
+    TOPGG_API_ENDPOINT_ARGS(get_user, const dpp::snowflake user_id);
     TOPGG_API_ENDPOINT_ARGS(post_stats, const stats& s);
     TOPGG_API_ENDPOINT(get_stats);
     TOPGG_API_ENDPOINT(get_voters);
-    TOPGG_API_ENDPOINT_ARGS(has_voted, const dpp::snowflake& user_id);
+    TOPGG_API_ENDPOINT_ARGS(has_voted, const dpp::snowflake user_id);
     TOPGG_API_ENDPOINT(is_weekend);
 
     friend class autoposter::base;
