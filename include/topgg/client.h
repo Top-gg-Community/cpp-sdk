@@ -7,35 +7,69 @@
 #include <string>
 #include <map>
 
-#define TOPGG_API_CALLBACK(return_type, name) \
-  using name##_completion_t = std::function<void(const result<return_type>&)>
-
-#define TOPGG_API_ENDPOINT(name) \
-  void name(const name##_completion_t& callback)
-
-#define TOPGG_API_ENDPOINT_ARGS(name, ...) \
-  void name(__VA_ARGS__, const name##_completion_t& callback)
-
 namespace topgg {
-  TOPGG_API_CALLBACK(bot, get_bot);
-  TOPGG_API_CALLBACK(user, get_user);
-  TOPGG_API_CALLBACK(stats, get_stats);
-  TOPGG_API_CALLBACK(std::vector<voter>, get_voters);
-  TOPGG_API_CALLBACK(bool, has_voted);
-  TOPGG_API_CALLBACK(bool, is_weekend);
+  /**
+   * @brief The callback function to call when get_bot completes.
+   */
+  using get_bot_completion_t = std::function<void(const result<bot>&)>;
 
+  /**
+   * @brief The callback function to call when get_user completes.
+   */
+  using get_user_completion_t = std::function<void(const result<user>&)>;
+
+  /**
+   * @brief The callback function to call when get_stats completes.
+   */
+  using get_stats_completion_t = std::function<void(const result<stats>&)>;
+
+  /**
+   * @brief The callback function to call when get_voters completes.
+   */
+  using get_voters_completion_t = std::function<void(const result<std::vector<voter>>&)>;
+
+  /**
+   * @brief The callback function to call when has_voted completes.
+   */
+  using has_voted_completion_t = std::function<void(const result<bool>&)>;
+
+  /**
+   * @brief The callback function to call when is_weekend completes.
+   */
+  using is_weekend_completion_t = std::function<void(const result<bool>&)>;
+
+  /**
+   * @brief The callback function to call when post_stats completes.
+   */
   using post_stats_completion_t = std::function<void(void)>;
 
+  /**
+   * @brief Base client class for HTTP purposes.
+   */
   class TOPGG_EXPORT base_client {
   protected:
+    /**
+     * @brief HTTP headers to use when making HTTP requests with the Top.gg API.
+     */
     std::multimap<std::string, std::string> m_headers;
 
+    /**
+     * @brief Constructs the base client class.
+     *
+     * @param token The Top.gg API token to use.
+     */
     base_client(const std::string& token);
 
   public:
+    /**
+     * @brief Don't use this class directly. Use its child classes!
+     */
     base_client() = delete;
   };
 
+  /**
+   * @brief Main client class that lets you make HTTP requests with the Top.gg API.
+   */
   class TOPGG_EXPORT client: private base_client {
     dpp::cluster* m_cluster;
 
@@ -45,23 +79,73 @@ namespace topgg {
     }
 
   public:
+    /**
+     * @brief That's not how you initiate the class buddy :)
+     */
     client() = delete;
 
+    /**
+     * @brief Constructs the client class.
+     *
+     * @param cluster A pointer to the bot's D++ cluster using this library.
+     * @param token The Top.gg API token to use.
+     */
     inline client(dpp::cluster* cluster, const std::string& token)
       : base_client(token), m_cluster(cluster) {}
 
-    TOPGG_API_ENDPOINT_ARGS(get_bot, const dpp::snowflake bot_id);
-    TOPGG_API_ENDPOINT_ARGS(get_user, const dpp::snowflake user_id);
-    TOPGG_API_ENDPOINT_ARGS(post_stats, const stats& s);
-    TOPGG_API_ENDPOINT(get_stats);
-    TOPGG_API_ENDPOINT(get_voters);
-    TOPGG_API_ENDPOINT_ARGS(has_voted, const dpp::snowflake user_id);
-    TOPGG_API_ENDPOINT(is_weekend);
+    /**
+     * @brief Fetches a listed Discord bot from a Discord ID.
+     *
+     * @param bot_id The Discord bot ID to fetch from.
+     * @param callback The callback function to call when get_bot completes.
+     */
+    void get_bot(const dpp::snowflake bot_id, const get_bot_completion_t& callback);
+
+    /**
+     * @brief Fetches a user from a Discord ID.
+     *
+     * @param user_id The Discord user ID to fetch from.
+     * @param callback The callback function to call when get_user completes.
+     */
+    void get_user(const dpp::snowflake user_id, const get_user_completion_t& callback);
+
+    /**
+     * @brief Fetches your Discord bot’s statistics.
+     *
+     * @param callback The callback function to call when get_stats completes.
+     */
+    void get_stats(const get_stats_completion_t& callback);
+
+    /**
+     * @brief Fetches your Discord bot’s last 1000 voters.
+     *
+     * @param callback The callback function to call when get_voters completes.
+     */
+    void get_voters(const get_voters_completion_t& callback);
+
+    /**
+     * @brief Checks if the specified user has voted your Discord bot.
+     *
+     * @param user_id The Discord user ID to check from.
+     * @param callback The callback function to call when has_voted completes.
+     */
+    void has_voted(const dpp::snowflake user_id, const has_voted_completion_t& callback);
+
+    /**
+     * @brief Checks if the weekend multiplier is active.
+     *
+     * @param callback The callback function to call when is_weekend completes.
+     */
+    void is_weekend(const is_weekend_completion_t& callback);
+
+    /**
+     * @brief Manually posts your Discord bot's statistics.
+     *
+     * @param s Your Discord bot's statistics.
+     * @param callback The callback function to call when post_stats completes.
+     */
+    void post_stats(const stats& s, const post_stats_completion_t& callback);
 
     friend class autoposter::base;
   };
 }; // namespace topgg
-
-#undef TOPGG_API_CALLBACK
-#undef TOPGG_API_ENDPOINT
-#undef TOPGG_API_ENDPOINT_ARGS

@@ -123,7 +123,7 @@ int main() {
 
 ### Cached autoposting
 
-If you want for the SDK to automatically retrieve server count itself by listening to Discord's gateway events, use `topgg::autoposter::cached`!
+If you want for the SDK to automatically retrieve the server count itself by listening to Discord's gateway events, use `topgg::autoposter::cached`!
 
 ```cpp
 #include <topgg/topgg.h>

@@ -8,16 +8,14 @@
 #include <memory>
 #include <mutex>
 
-#define TOPGG_NO_COPYING(name)                      \
-  name(const name& other) = delete;                 \
-  name(name&& other) = delete;                      \
-  name& operator=(const name& other) & = delete;    \
-  name& operator=(name&& other) & = delete
-
 namespace topgg {
   namespace autoposter {
     class cached;
 
+    /**
+     * @brief A modified semaphore that can be aborted.
+     * This class is private and can't be used outside of topgg's internal code.
+     */
     class killable_semaphore {
       std::mutex m_mutex;
       std::condition_variable m_condition;
@@ -32,15 +30,40 @@ namespace topgg {
       void kill();
 
     public:
+      /**
+       * @brief No outsiders are allowed to use this class, internal use only :)
+       */
       killable_semaphore() = delete;
-      TOPGG_NO_COPYING(killable_semaphore);
+
+      /**
+       * @brief This class can't be copied.
+       */
+      killable_semaphore(const killable_semaphore& other) = delete;
+
+      /**
+       * @brief This class can't be moved.
+       */
+      killable_semaphore(killable_semaphore&& other) = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      killable_semaphore& operator=(const killable_semaphore& other) & = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      killable_semaphore& operator=(killable_semaphore&& other) & = delete;
 
       friend class cached;
     };
 
     class base;
 
-    // such a menacing name
+    /**
+     * @brief A modified timer that can be aborted.
+     * This class is private and can't be used outside of topgg's internal code.
+     */
     class killable_waiter {
       std::mutex m_mutex;
       std::condition_variable m_condition;
@@ -61,11 +84,33 @@ namespace topgg {
       void kill();
 
     public:
-      TOPGG_NO_COPYING(killable_waiter);
+      /**
+       * @brief This class can't be copied.
+       */
+      killable_waiter(const killable_waiter& other) = delete;
+
+      /**
+       * @brief This class can't be moved.
+       */
+      killable_waiter(killable_waiter&& other) = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      killable_waiter& operator=(const killable_waiter& other) & = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      killable_waiter& operator=(killable_waiter&& other) & = delete;
 
       friend class base;
     };
 
+    /**
+     * @brief Base class for autoposter classes.
+     * This class stores autoposter thread and handles requests with the API, with methods to be implemented by its child classes.
+     */
     class TOPGG_EXPORT base: private ::topgg::base_client {
       killable_waiter m_waiter;
       std::thread m_thread;
@@ -80,13 +125,24 @@ namespace topgg {
       void thread_loop(dpp::cluster* thread_cluster);
 
     protected:
+      /**
+       * @brief A shared pointer to the bot's D++ cluster.
+       */
       std::shared_ptr<dpp::cluster> m_cluster;
 
+      /**
+       * @brief Constructs the base autoposter class.
+       *
+       * @param cluster A shared pointer to the bot's D++ cluster. This pointer will be used later in the autoposter thread.
+       * @param token The Top.gg API token to use.
+       * @param delay The minimum delay between post requests. This delay mustn't be shorter than 15 minutes.
+       * @throw std::invalid_argument Throwns if the delay argument is shorter than 15 minutes.
+       */
       template<class R, class P>
       base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay)
         : ::topgg::base_client(token), m_cluster(std::shared_ptr{cluster}) {
         if (delay < std::chrono::minutes(15)) {
-          throw std::invalid_argument{"Delay can't be shorter than 15 minutes."};
+          throw std::invalid_argument{"Delay mustn't be shorter than 15 minutes."};
         }
 
         // clang-format off
@@ -101,14 +157,46 @@ namespace topgg {
       }
 
     public:
+      /**
+       * @brief Don't use this class directly. Use its child classes!
+       */
       base() = delete;
-      TOPGG_NO_COPYING(base);
 
+      /**
+       * @brief This class can't be copied.
+       */
+      base(const base& other) = delete;
+
+      /**
+       * @brief This class can't be moved.
+       */
+      base(base&& other) = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      base& operator=(const base& other) & = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      base& operator=(base&& other) & = delete;
+
+      /**
+       * @brief Requests the autoposter thread to stop.
+       * @note This function does NOT block and wait for the thread to stop. That's the destructor's job.
+       */
       virtual void stop();
 
+      /**
+       * @brief Requests the autoposter thread to stop and blocks until the thread is completely shut down.
+       */
       ~base();
     };
 
+    /**
+     * @brief An autoposter class that automatically retrieves the server count itself by manually listening to Discord's gateway events.
+     */
     class TOPGG_EXPORT cached: public base {
       std::mutex m_mutex;
       killable_semaphore m_semaphore;
@@ -127,18 +215,55 @@ namespace topgg {
       }
 
     public:
+      /**
+       * @brief Constructs the autoposter class.
+       *
+       * @param cluster A shared pointer to the bot's D++ cluster. This pointer will be used later in the autoposter thread.
+       * @param token The Top.gg API token to be used.
+       * @param delay The minimum delay between post requests. This delay mustn't be shorter than 15 minutes.
+       * @throw std::invalid_argument Throwns if the delay argument is shorter than 15 minutes.
+       */
       template<class R, class P>
       inline cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay)
         : base(cluster, token, delay), m_semaphore(killable_semaphore{0}) {
         start_listening();
       }
 
+      /**
+       * @brief That's not how you initiate the class buddy :)
+       */
       cached() = delete;
-      TOPGG_NO_COPYING(cached);
 
+      /**
+       * @brief This class can't be copied.
+       */
+      cached(const cached& other) = delete;
+
+      /**
+       * @brief This class can't be moved.
+       */
+      cached(cached&& other) = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      cached& operator=(const cached& other) & = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      cached& operator=(cached&& other) & = delete;
+
+      /**
+       * @brief Requests the autoposter thread to stop.
+       * @note This function does NOT block and wait for the thread to stop. That's the destructor's job.
+       */
       void stop() override;
     };
 
+    /**
+     * @brief An autoposter class that lets you manually retrieve the stats.
+     */
     class TOPGG_EXPORT custom: public base {
       std::function<::topgg::stats(dpp::cluster*)> m_callback;
 
@@ -147,14 +272,43 @@ namespace topgg {
       }
 
     public:
+      /**
+       * @brief Constructs the autoposter class.
+       *
+       * @param cluster A shared pointer to the bot's D++ cluster. This pointer will be used later in the autoposter thread.
+       * @param token The Top.gg API token to be used.
+       * @param delay The minimum delay between post requests. This delay mustn't be shorter than 15 minutes.
+       * @param callback The callback function that returns the current stats.
+       * @throw std::invalid_argument Throwns if the delay argument is shorter than 15 minutes.
+       */
       template<class R, class P>
       inline custom(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const std::chrono::duration<R, P>& delay, std::function<::topgg::stats(dpp::cluster*)>&& callback)
         : base(cluster, token, delay), m_callback(callback) {}
 
+      /**
+       * @brief That's not how you initiate the class buddy :)
+       */
       custom() = delete;
-      TOPGG_NO_COPYING(custom);
+
+      /**
+       * @brief This class can't be copied.
+       */
+      custom(const custom& other) = delete;
+
+      /**
+       * @brief This class can't be moved.
+       */
+      custom(custom&& other) = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      custom& operator=(const custom& other) & = delete;
+
+      /**
+       * @brief This class can't be assigned from other objects.
+       */
+      custom& operator=(custom&& other) & = delete;
     };
   }; // namespace autoposter
 }; // namespace topgg
-
-#undef TOPGG_NO_COPYING
