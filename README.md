@@ -50,6 +50,31 @@ cmake --build build --config Release
 
 ## Examples
 
+### Fetching a bot from its Discord ID
+
+```cpp
+#include <topgg/topgg.h>
+#include <dpp/dpp.h>
+#include <iostream>
+
+int main() {
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
+
+  topgg_client.get_bot(264811613708746752, [](const auto& result) {
+    try {
+      const auto topgg_bot = result.get();
+    
+      std::cout << topgg_bot.username << std::endl;
+    } catch (const std::exception& ext) {
+      std::cout << "error: " << ext.what() << std::endl;
+    }
+  });
+
+  return 0;
+}
+```
+
 ### Fetching a user from its Discord ID
 
 ```cpp

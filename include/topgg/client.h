@@ -96,6 +96,23 @@ namespace topgg {
     /**
      * @brief Fetches a listed Discord bot from a Discord ID.
      *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * topgg_client.get_bot(264811613708746752, [](const auto& result) {
+     *   try {
+     *     const auto topgg_bot = result.get();
+     *
+     *     std::cout << topgg_bot.username << std::endl;
+     *   } catch (const std::exception& ext) {
+     *     std::cout << "error: " << ext.what() << std::endl;
+     *   }
+     * });
+     * ```
+     *
      * @param bot_id The Discord bot ID to fetch from.
      * @param callback The callback function to call when get_bot completes.
      */
@@ -103,6 +120,23 @@ namespace topgg {
 
     /**
      * @brief Fetches a user from a Discord ID.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * topgg_client.get_user(661200758510977084, [](const auto& result) {
+     *   try {
+     *     const auto user = result.get();
+     *
+     *     std::cout << user.username << std::endl;
+     *   } catch (const std::exception& ext) {
+     *     std::cout << "error: " << ext.what() << std::endl;
+     *   }
+     * });
+     * ```
      *
      * @param user_id The Discord user ID to fetch from.
      * @param callback The callback function to call when get_user completes.
@@ -112,6 +146,23 @@ namespace topgg {
     /**
      * @brief Fetches your Discord bot’s statistics.
      *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * topgg_client.get_stats([](const auto& result) {
+     *   try {
+     *     auto stats = result.get();
+     *
+     *     std::cout << stats.server_count().value_or(0) << std::endl;
+     *   } catch (const std::exception& ext) {
+     *     std::cout << "error: " << ext.what() << std::endl;
+     *   }
+     * });
+     * ```
+     *
      * @param callback The callback function to call when get_stats completes.
      */
     void get_stats(const get_stats_completion_t& callback);
@@ -119,12 +170,48 @@ namespace topgg {
     /**
      * @brief Fetches your Discord bot’s last 1000 voters.
      *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * topgg_client.get_voters([](const auto& result) {
+     *   try {
+     *     auto voters = result.get();
+     *
+     *     for (auto& voter: voters) {
+     *       std::cout << voter.username << std::endl;
+     *     }
+     *   } catch (const std::exception& ext) {
+     *     std::cout << "error: " << ext.what() << std::endl;
+     *   }
+     * });
+     * ```
+     *
      * @param callback The callback function to call when get_voters completes.
      */
     void get_voters(const get_voters_completion_t& callback);
 
     /**
      * @brief Checks if the specified user has voted your Discord bot.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * topgg_client.has_voted(661200758510977084, [](const auto& result) {
+     *   try {
+     *     if (result.get()) {
+     *       std::cout << "checks out" << std::endl;
+     *     }
+     *   } catch (const std::exception& ext) {
+     *     std::cout << "error: " << ext.what() << std::endl;
+     *   }
+     * });
+     * ```
      *
      * @param user_id The Discord user ID to check from.
      * @param callback The callback function to call when has_voted completes.
@@ -134,12 +221,42 @@ namespace topgg {
     /**
      * @brief Checks if the weekend multiplier is active.
      *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * topgg_client.is_weekend([](const auto& result) {
+     *   try {
+     *     if (result.get()) {
+     *       std::cout << "the weekend multiplier is active" << std::endl;
+     *     }
+     *   } catch (const std::exception& ext) {
+     *     std::cout << "error: " << ext.what() << std::endl;
+     *   }
+     * });
+     * ```
+     *
      * @param callback The callback function to call when is_weekend completes.
      */
     void is_weekend(const is_weekend_completion_t& callback);
 
     /**
      * @brief Manually posts your Discord bot's statistics.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * const size_t server_count = 12345;
+     *
+     * topgg_client.post_stats(topgg::stats{server_count}, []() {
+     *   std::cout << "stats posted!" << std::endl;
+     * });
+     * ```
      *
      * @param s Your Discord bot's statistics.
      * @param callback The callback function to call when post_stats completes.
