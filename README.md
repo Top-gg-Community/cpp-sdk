@@ -29,7 +29,7 @@ cmake -B build .
 cmake --build build --config Release
 ```
 
-OSX:
+macOS:
 
 ```sh
 # install D++
