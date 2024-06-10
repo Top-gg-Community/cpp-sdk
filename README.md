@@ -1,73 +1,189 @@
 # Top.gg SDK for C++
 
-The official open-source C++ wrapper for the Top.gg API.
+The official C++ SDK for the [Top.gg API](https://docs.top.gg).
 
-This is a simple C++ SDK for interacting with the [Top.gg API](https://docs.top.gg).
+## Building from source
 
-## Features
+Linux (Debian-like):
 
-- Making authenticated requests to the Top.gg API using a bot token
-- Parsing Top.gg API responses into convenient C++ objects
-- Examples demonstrating how to use the SDK to implement a votebot and leaderboard
+```sh
+# install D++
+wget -O dpp.deb https://dl.dpp.dev/latest
+dpkg -i dpp.deb
 
-## Getting Started
-
-1. Clone the repository:
-
-```
-git clone https://github.com/pneb/cpp-sdk.git
+# build topgg
+cmake -B build .
+cmake --build build --config Release
 ```
 
-2. Add the `include` and `src` directories to your project's include path and library path, respectively.
+Linux (CentOS-like):
 
-3. Build the `topgg` library:
+```sh
+# install D++
+yum install wget
+wget -O dpp.rpm https://dl.dpp.dev/latest/linux-x64/rpm
+yum localinstall dpp.rpm
 
-```
-cd cpp-sdk
-mkdir build
-cd build
-cmake ..
-make
-```
-
-4. Build the examples:
-
-```
-make example-votebot
-make example-leaderboard
+# build topgg
+cmake -B build .
+cmake --build build --config Release
 ```
 
-5. Run the examples:
+macOS:
 
+```sh
+# install D++
+brew install libdpp
+brew link libdpp
+
+# build topgg
+cmake -B build .
+cmake --build build --config Release
 ```
-./example-votebot
-./example-leaderboard
+
+Windows:
+
+```bat
+cmake -B build .
+cmake --build build --config Release
 ```
 
-Note that the examples require you to have a Top.gg bot token set as an environment variable `TOPGG_BOT_TOKEN`.
+## Examples
 
-## Usage
+### Fetching a bot from its Discord ID
 
-Include the `topgg/http/client.hpp` header and create an instance of `topgg::Api` with your Top.gg bot token:
+```cpp
+#include <topgg/topgg.h>
+#include <dpp/dpp.h>
+#include <iostream>
 
-```c++
-#include <string>
-#include "topgg/topgg.hpp"
+int main() {
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
 
-// Put your bot token here
-const std::string BOT_TOKEN = "YOUR_BOT_TOKEN";
+  topgg_client.get_bot(264811613708746752, [](const auto& result) {
+    try {
+      const auto topgg_bot = result.get();
+    
+      std::cout << topgg_bot.username << std::endl;
+    } catch (const std::exception& ext) {
+      std::cout << "error: " << ext.what() << std::endl;
+    }
+  });
 
-int main()
-{
-    topgg::Api api(BOT_TOKEN);
-
-    // Use the api object to make requests to the Top.gg API
-    return 0;
+  return 0;
 }
 ```
 
-Refer to the [Top.gg API documentation](https://docs.top.gg) for information on the available endpoints and request structures.
+### Fetching a user from its Discord ID
 
-## Contributing
+```cpp
+#include <topgg/topgg.h>
+#include <dpp/dpp.h>
+#include <iostream>
 
-Pull requests are welcome! Please include unit tests for any added or modified functionality.
+int main() {
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
+
+  topgg_client.get_user(661200758510977084, [](const auto& result) {
+    try {
+      const auto user = result.get();
+    
+      std::cout << user.username << std::endl;
+    } catch (const std::exception& ext) {
+      std::cout << "error: " << ext.what() << std::endl;
+    }
+  });
+
+  return 0;
+}
+```
+
+### Posting your bot's statistics
+
+```cpp
+#include <topgg/topgg.h>
+#include <dpp/dpp.h>
+#include <iostream>
+
+int main() {
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
+
+  const size_t server_count = 12345;
+
+  topgg_client.post_stats(topgg::stats{server_count}, []() {
+    std::cout << "stats posted!" << std::endl;
+  });
+
+  return 0;
+}
+```
+
+### Checking if a user has voted your bot
+
+```cpp
+#include <topgg/topgg.h>
+#include <dpp/dpp.h>
+#include <iostream>
+
+int main() {
+  dpp::cluster bot{"your bot token"};
+  topgg::client topgg_client{&bot, "your top.gg token"};
+
+  topgg_client.has_voted(661200758510977084, [](const auto& result) {
+    try {
+      if (result.get()) {
+        std::cout << "checks out" << std::endl;
+      }
+    } catch (const std::exception& ext) {
+      std::cout << "error: " << ext.what() << std::endl;
+    }
+  });
+
+  return 0;
+}
+```
+
+### Cached autoposting
+
+If you want for the SDK to automatically retrieve the server count itself by listening to Discord's gateway events, use `topgg::autoposter::cached`!
+
+```cpp
+#include <topgg/topgg.h>
+#include <dpp/dpp.h>
+
+int main() {
+  std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
+  
+  topgg::autoposter::cached autoposter{bot, "your top.gg token", std::chrono::minutes(15)};
+
+  // your bot's code...
+
+  return 0;
+}
+```
+
+### Stats-fed autoposting
+
+If you want to use your own function (e.g: retrieve the server count on your own by making an SQL query), then you can use `topgg::autoposter::custom`!
+
+```cpp
+#include <topgg/topgg.h>
+#include <dpp/dpp.h>
+
+static topgg::stats fetch_stats(dpp::cluster* bot) {
+  // fetch server count here...
+}
+
+int main() {
+  std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
+  
+  topgg::autoposter::custom autoposter{bot, "your top.gg token", std::chrono::minutes(15), fetch_stats};
+
+  // your bot's code...
+
+  return 0;
+}
+```

@@ -1,74 +1,68 @@
-#include "topgg/client.hpp"
+#include <topgg/topgg.h>
 
-#include <nlohmann/json.hpp>
-#include <sstream>
+using topgg::base_client;
+using topgg::client;
 
-#include "topgg/request.hpp"
-#include "topgg/response.hpp"
-
-using namespace topgg;
-using namespace topgg::http;
-
-Client::Client(const std::string& token, const std::string& botId)
-    : m_token(token), m_botId(botId) {}
-
-std::string Client::getBotId() const { return m_botId; }
-
-std::string Client::getToken() const { return m_token; }
-
-std::vector<UserVote> Client::getVotes() {
-  Request request(Request::Method::GET,
-                  "https://top.gg/api/bots/" + m_botId + "/votes");
-  request.setHeader("Authorization", m_token);
-  auto response = request.send();
-  auto statusCode = response.first;
-  auto responseBody = response.second;
-
-  if (statusCode == 200) {
-    std::vector<UserVote> votes;
-    std::istringstream iss(responseBody);
-    std::string line;
-    while (std::getline(iss, line)) {
-      std::istringstream iss2(line);
-      std::string userIdStr;
-      std::string voteTimeStr;
-      if (std::getline(iss2, userIdStr, ',')) {
-        if (std::getline(iss2, voteTimeStr)) {
-          try {
-            std::chrono::system_clock::time_point voteTime =
-                std::chrono::system_clock::from_time_t(std::stoi(voteTimeStr));
-            votes.emplace_back(userIdStr, voteTime);
-          } catch (const std::exception&) {
-            continue;
-          }
-        }
-      }
-    }
-    return votes;
-  } else {
-    throw TopggAPIError("Failed to get votes: " + responseBody);
-  }
+base_client::base_client(const std::string& token) {
+  m_headers.insert(std::pair("Authorization", "Bearer " + token));
+  m_headers.insert(std::pair("Connection", "close"));
+  m_headers.insert(std::pair("Content-Type", "application/json"));
+  m_headers.insert(std::pair("User-Agent", "topgg (https://github.com/top-gg-community/cpp-sdk) D++"));
 }
 
-BotStats Client::getStats() {
-  Request request(Request::Method::GET,
-                  "https://top.gg/api/bots/" + m_botId + "/stats");
-  request.setHeader("Authorization", m_token);
-  auto response = request.send();
-  auto statusCode = response.first;
-  auto responseBody = response.second;
+#define TOPGG_API_ENDPOINT(name) \
+  void client::name(const topgg::name##_completion_t& callback)
 
-  if (statusCode == 200) {
-    nlohmann::json json = nlohmann::json::parse(responseBody);
-    int serverCount = json.value("server_count", 0);
-    std::vector<int> shardCount = json.value("shards", std::vector<int>{});
-    std::vector<int> shardIds;
-    if (!shardCount.empty()) {
-      shardIds.resize(shardCount.size());
-      std::iota(shardIds.begin(), shardIds.end(), 0);
+#define TOPGG_API_ENDPOINT_ARGS(name, ...) \
+  void client::name(__VA_ARGS__, const topgg::name##_completion_t& callback)
+
+TOPGG_API_ENDPOINT_ARGS(get_bot, const dpp::snowflake bot_id) {
+  basic_request<topgg::bot>("/bots/" + std::to_string(bot_id), callback, [](const auto& j) {
+    return topgg::bot{j};
+  });
+}
+
+TOPGG_API_ENDPOINT_ARGS(get_user, const dpp::snowflake user_id) {
+  basic_request<topgg::user>("/users/" + std::to_string(user_id), callback, [](const auto& j) {
+    return topgg::user{j};
+  });
+}
+
+TOPGG_API_ENDPOINT_ARGS(post_stats, const stats& s) {
+  auto headers = std::multimap<std::string, std::string>{m_headers};
+  const auto s_json = s.to_json();
+
+  headers.insert(std::pair("Content-Length", std::to_string(s_json.size())));
+
+  m_cluster->request("https://top.gg/api/bots/stats", dpp::m_post, [callback](TOPGG_UNUSED const auto& _) { callback(); }, s_json, "application/json", headers);
+}
+
+TOPGG_API_ENDPOINT(get_stats) {
+  basic_request<topgg::stats>("/bots/stats", callback, [](const auto& j) {
+    return topgg::stats{j};
+  });
+}
+
+TOPGG_API_ENDPOINT(get_voters) {
+  basic_request<std::vector<topgg::voter>>("/bots/votes", callback, [](const auto& j) {
+    std::vector<topgg::voter> voters;
+
+    for (const auto& part: j) {
+      voters.push_back(topgg::voter{part});
     }
-    return BotStats(serverCount, shardCount, shardIds);
-  } else {
-    throw TopggAPIError("Failed to get stats: " + responseBody);
-  }
+
+    return voters;
+  });
+}
+
+TOPGG_API_ENDPOINT_ARGS(has_voted, const dpp::snowflake user_id) {
+  basic_request<bool>("/bots/votes?userId=" + std::to_string(user_id), callback, [](const auto& j) {
+    return j["voted"].template get<uint8_t>() != 0;
+  });
+}
+
+TOPGG_API_ENDPOINT(is_weekend) {
+  basic_request<bool>("/weekend", callback, [](const auto& j) {
+    return j["is_weekend"].template get<bool>();
+  });
 }

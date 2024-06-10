@@ -1,51 +1,42 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8.2)
 
-project(topgg-sdk LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-add_library(topgg
-    src/client.cpp
-    src/http/request.cpp
-    src/http/response.cpp
-    include/topgg/client.hpp
-    include/topgg/request.hpp
-    include/topgg/response.hpp
+project(
+  topgg
+  LANGUAGES CXX
+  HOMEPAGE_URL "https://docs.top.gg/docs"
+  DESCRIPTION "The official C++ wrapper for the Top.gg API."
 )
 
-target_include_directories(topgg PUBLIC include)
+file(GLOB TOPGG_SOURCE_FILES src/*.cpp)
 
-target_link_libraries(topgg PUBLIC
-    ${CURL_LIBRARIES}
-    nlohmann_json::nlohmann_json
+add_library(topgg SHARED ${TOPGG_SOURCE_FILES})
+
+set_target_properties(topgg PROPERTIES
+  OUTPUT_NAME           topgg
+  CXX_STANDARD          17
+  CXX_STANDARD_REQUIRED ON
 )
 
-if (MSVC)
-    target_compile_options(topgg PRIVATE /W4 /WX)
-else ()
-    target_compile_options(topgg PRIVATE -Wall -Wextra -pedantic -Werror)
-endif ()
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-add_executable(votebot
-    examples/votebot.cpp
+find_package(DPP REQUIRED)
+
+if(MSVC)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /Oi /Oy /Gy")
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Wpedantic -Wformat=2 -Wnull-dereference -Wuninitialized -Wdeprecated")
+endif()
+
+if(WIN32)
+target_compile_definitions(topgg PRIVATE TOPGG_SHARED)
+target_compile_definitions(topgg PRIVATE __TOPGG_BUILDING__)
+endif()
+
+target_include_directories(topgg PUBLIC
+  ${CMAKE_SOURCE_DIR}/include
+  ${DPP_INCLUDE_DIR}
 )
 
-target_link_libraries(votebot PRIVATE
-    topgg
-)
-
-add_executable(leaderboard
-    examples/leaderboard.cpp
-)
-
-target_link_libraries(leaderboard PRIVATE
-    topgg
-)
-
-find_package(CURL REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
-
-# Uncomment if you want to run unit tests
-# enable_testing()
-# add_subdirectory(test)
+target_link_libraries(topgg ${DPP_LIBRARIES})
