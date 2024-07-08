@@ -118,7 +118,7 @@ namespace topgg {
     T get() const {
       m_internal.prepare();
 
-      return m_parse_fn(dpp::json::parse(m_response.body));
+      return m_parse_fn(dpp::json::parse(m_internal.m_response.body));
     }
 
     friend class client;

@@ -41,7 +41,7 @@ namespace topgg {
   /**
    * @brief The callback function to call when post_stats completes.
    */
-  using post_stats_completion_t = std::function<void(void)>;
+  using post_stats_completion_t = std::function<void(bool)>;
 
   /**
    * @brief Base client class for HTTP purposes.
@@ -118,6 +118,10 @@ namespace topgg {
      */
     void get_bot(const dpp::snowflake bot_id, const get_bot_completion_t& callback);
 
+#ifdef DPP_CORO
+    dpp::async<topgg::result<topgg::bot>> co_get_bot(const dpp::snowflake bot_id);
+#endif
+
     /**
      * @brief Fetches a user from a Discord ID.
      *
@@ -143,6 +147,10 @@ namespace topgg {
      */
     void get_user(const dpp::snowflake user_id, const get_user_completion_t& callback);
 
+#ifdef DPP_CORO
+    dpp::async<topgg::result<topgg::user>> co_get_user(const dpp::snowflake user_id);
+#endif
+
     /**
      * @brief Fetches your Discord bot’s statistics.
      *
@@ -166,6 +174,10 @@ namespace topgg {
      * @param callback The callback function to call when get_stats completes.
      */
     void get_stats(const get_stats_completion_t& callback);
+
+#ifdef DPP_CORO
+    dpp::async<topgg::result<topgg::stats>> co_get_stats();
+#endif
 
     /**
      * @brief Fetches your Discord bot’s last 1000 voters.
@@ -193,6 +205,10 @@ namespace topgg {
      */
     void get_voters(const get_voters_completion_t& callback);
 
+#ifdef DPP_CORO
+    dpp::async<topgg::result<std::vector<voter>>> co_get_voters();
+#endif
+
     /**
      * @brief Checks if the specified user has voted your Discord bot.
      *
@@ -218,6 +234,9 @@ namespace topgg {
      */
     void has_voted(const dpp::snowflake user_id, const has_voted_completion_t& callback);
 
+#ifdef DPP_CORO
+    dpp::async<topgg::result<bool>> co_has_voted(const dpp::snowflake user_id);
+#endif
     /**
      * @brief Checks if the weekend multiplier is active.
      *
@@ -242,6 +261,9 @@ namespace topgg {
      */
     void is_weekend(const is_weekend_completion_t& callback);
 
+#ifdef DPP_CORO
+    dpp::async<topgg::result<bool>> co_is_weekend();
+#endif
     /**
      * @brief Manually posts your Discord bot's statistics.
      *
@@ -262,6 +284,10 @@ namespace topgg {
      * @param callback The callback function to call when post_stats completes.
      */
     void post_stats(const stats& s, const post_stats_completion_t& callback);
+
+#ifdef DPP_CORO
+    dpp::async<bool> co_post_stats(const stats& s);
+#endif
 
     friend class autoposter::base;
   };
