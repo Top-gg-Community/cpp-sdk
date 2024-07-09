@@ -7,6 +7,8 @@ project(
   DESCRIPTION "The official C++ wrapper for the Top.gg API."
 )
 
+option(ENABLE_CORO "Support for C++20 coroutines" OFF)
+
 file(GLOB TOPGG_SOURCE_FILES src/*.cpp)
 
 add_library(topgg SHARED ${TOPGG_SOURCE_FILES})
@@ -16,6 +18,14 @@ set_target_properties(topgg PROPERTIES
   CXX_STANDARD          17
   CXX_STANDARD_REQUIRED ON
 )
+
+if (ENABLE_CORO)
+    target_compile_definitions(topgg PUBLIC DPP_CORO=ON)
+    set_target_properties(topgg PROPERTIES
+            CXX_STANDARD 20
+            CXX_STANDARD_REQUIRED ON
+    )
+endif()
 
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
