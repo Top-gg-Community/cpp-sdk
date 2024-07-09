@@ -119,6 +119,27 @@ namespace topgg {
     void get_bot(const dpp::snowflake bot_id, const get_bot_completion_t& callback);
 
 #ifdef DPP_CORO
+    /**
+     * @brief Fetches a listed Discord bot from a Discord ID.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * auto result = co_await topgg_client.get_bot(264811613708746752);
+     * try {
+     *   const auto topgg_bot = result.get();
+     *     std::cout << topgg_bot.username << std::endl;
+     * } catch (const std::exception& ext) {
+     *   std::cout << "error: " << ext.what() << std::endl;
+     * }
+     * ```
+     *
+     * @param bot_id The Discord bot ID to fetch from.
+     * @return co_await to retrieve a topgg::result<topgg::bot>
+     */
     dpp::async<topgg::result<topgg::bot>> co_get_bot(const dpp::snowflake bot_id);
 #endif
 
@@ -148,6 +169,27 @@ namespace topgg {
     void get_user(const dpp::snowflake user_id, const get_user_completion_t& callback);
 
 #ifdef DPP_CORO
+    /**
+     * @brief Fetches a user from a Discord ID.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * const auto result = co_await topgg_client.get_user(661200758510977084);
+     * try {
+     *   const auto user = result.get();
+     *   std::cout << user.username << std::endl;
+     * } catch (const std::exception& ext) {
+     *   std::cout << "error: " << ext.what() << std::endl;
+     * }
+     * ```
+     *
+     * @param user_id The Discord user ID to fetch from.
+     * @return co_await to retrieve a topgg::result<topgg::user>
+     */
     dpp::async<topgg::result<topgg::user>> co_get_user(const dpp::snowflake user_id);
 #endif
 
@@ -176,6 +218,26 @@ namespace topgg {
     void get_stats(const get_stats_completion_t& callback);
 
 #ifdef DPP_CORO
+    /**
+     * @brief Fetches your Discord bot’s statistics.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * const auto result = co_await topgg_client.get_stats();
+     * try {
+     *   auto stats = result.get();
+     *   std::cout << stats.server_count().value_or(0) << std::endl;
+     * } catch (const std::exception& ext) {
+     *   std::cout << "error: " << ext.what() << std::endl;
+     * }
+     * ```
+     *
+     * @return co_await to retrieve a topgg::result<topgg::stats>
+     */
     dpp::async<topgg::result<topgg::stats>> co_get_stats();
 #endif
 
@@ -206,6 +268,28 @@ namespace topgg {
     void get_voters(const get_voters_completion_t& callback);
 
 #ifdef DPP_CORO
+    /**
+     * @brief Fetches your Discord bot’s last 1000 voters.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * const auto result = co_await topgg_client.get_voters();
+     * try {
+     *   auto voters = result.get();
+     *   for (auto& voter: voters) {
+     *     std::cout << voter.username << std::endl;
+     *   }
+     * } catch (const std::exception& ext) {
+     *   std::cout << "error: " << ext.what() << std::endl;
+     * }
+     * ```
+     *
+     * @return co_await to retrieve a topgg::result<topgg::stats>
+     */
     dpp::async<topgg::result<std::vector<voter>>> co_get_voters();
 #endif
 
@@ -235,8 +319,31 @@ namespace topgg {
     void has_voted(const dpp::snowflake user_id, const has_voted_completion_t& callback);
 
 #ifdef DPP_CORO
+    /**
+     * @brief Checks if the specified user has voted your Discord bot.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * const auto result = co_await topgg_client.has_voted(661200758510977084);
+     * try {
+     *   if (result.get()) {
+     *     std::cout << "checks out" << std::endl;
+     *   }
+     * } catch (const std::exception& ext) {
+     *   std::cout << "error: " << ext.what() << std::endl;
+     * }
+     * ```
+     *
+     * @param user_id The Discord user ID to check from.
+     * @return co_await to retrieve a topgg::result<bool>
+     */
     dpp::async<topgg::result<bool>> co_has_voted(const dpp::snowflake user_id);
 #endif
+
     /**
      * @brief Checks if the weekend multiplier is active.
      *
@@ -262,8 +369,30 @@ namespace topgg {
     void is_weekend(const is_weekend_completion_t& callback);
 
 #ifdef DPP_CORO
+    /**
+     * @brief Checks if the weekend multiplier is active.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * const auto result = co_await topgg_client.is_weekend();
+     * try {
+     *   if (result.get()) {
+     *     std::cout << "the weekend multiplier is active" << std::endl;
+     *   }
+     * } catch (const std::exception& ext) {
+     *   std::cout << "error: " << ext.what() << std::endl;
+     * }
+     * ```
+     *
+     * @return co_await to retrieve a topgg::result<bool>
+     */
     dpp::async<topgg::result<bool>> co_is_weekend();
 #endif
+
     /**
      * @brief Manually posts your Discord bot's statistics.
      *
@@ -286,6 +415,23 @@ namespace topgg {
     void post_stats(const stats& s, const post_stats_completion_t& callback);
 
 #ifdef DPP_CORO
+    /**
+     * @brief Manually posts your Discord bot's statistics.
+     *
+     * Example:
+     *
+     * ```cpp
+     * dpp::cluster bot{"your bot token"};
+     * topgg::client topgg_client{&bot, "your top.gg token"};
+     *
+     * const size_t server_count = 12345;
+     * co_await topgg_client.post_stats(topgg::stats{server_count});
+     * std::cout << "stats posted!" << std::endl;
+     * ```
+     *
+     * @param s Your Discord bot's statistics.
+     * @return co_await to retrieve a topgg::result<bool>
+     */
     dpp::async<bool> co_post_stats(const stats& s);
 #endif
 
