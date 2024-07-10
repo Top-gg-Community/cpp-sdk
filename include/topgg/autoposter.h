@@ -19,32 +19,18 @@ namespace topgg {
       dpp::timer m_timer_handle{};
 
       /**
-       * Must return true to fetch the statistics
-       * @return
-       */
-      virtual inline bool before_fetch() {
-        return true;
-      }
-
-      /**
-       * Called after fetching statistics
-       */
-      virtual inline void after_fetch() {
-      }
-
-      /**
        * Implement this interface to return the bot's statistics
        * @param bot D++ cluster
        * @return topgg::stats instance
        */
-      virtual ::topgg::stats get_stats(dpp::cluster* bot) = 0;
+      virtual ::topgg::stats get_stats(dpp::cluster& bot) = 0;
 
     protected:
 
       /**
        * @brief A shared pointer to the bot's D++ cluster.
        */
-      std::shared_ptr<dpp::cluster> m_cluster;
+      dpp::cluster& m_cluster;
 
       /**
        * @brief Constructs the base autoposter class.
@@ -54,7 +40,7 @@ namespace topgg {
        * @param delay The minimum delay between post requests in seconds. This delay mustn't be shorter than 15 minutes.
        * @throw std::invalid_argument Throws if the delay argument is shorter than 15 minutes.
        */
-      base(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const time_t delay);
+      base(dpp::cluster& cluster, const std::string& token, const time_t delay);
 
     public:
 
@@ -111,18 +97,18 @@ namespace topgg {
        * @param bot cluster pointer
        * @return topgg::stats
        */
-      ::topgg::stats get_stats(TOPGG_UNUSED dpp::cluster* bot) override;
+      ::topgg::stats get_stats(TOPGG_UNUSED dpp::cluster& bot) override;
 
     public:
       /**
        * @brief Constructs the autoposter class.
        *
-       * @param cluster A shared pointer to the bot's D++ cluster. This pointer is used in the timer handler.
+       * @param cluster Reference to the bot's D++ cluster. This pointer is used in the timer handler.
        * @param token The Top.gg API token to be used.
        * @param delay The minimum delay between post requests in seconds. This delay mustn't be shorter than 15 minutes.
        * @throw std::invalid_argument Throws if the delay argument is shorter than 15 minutes.
        */
-      cached(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const time_t delay);
+      cached(dpp::cluster& cluster, const std::string& token, const time_t delay);
 
       /**
        * @brief That's not how you initiate the class buddy :)
@@ -154,6 +140,8 @@ namespace topgg {
       cached& operator=(cached&& other) & = delete;
     };
 
+    using custom_autopost_callback = std::function<::topgg::stats(dpp::cluster&)>;
+
     /**
      * @brief An autoposter class that lets you manually retrieve the stats.
      */
@@ -162,14 +150,14 @@ namespace topgg {
       /**
        * Callback for retrieving stats
        */
-      std::function<::topgg::stats(dpp::cluster*)> m_callback;
+      custom_autopost_callback m_callback;
 
       /**
        * Calls the callback to get the stats
        * @param bot D++ cluster
        * @return topgg::stats
        */
-      inline ::topgg::stats get_stats(dpp::cluster* bot) override {
+      inline ::topgg::stats get_stats(dpp::cluster& bot) override {
         return m_callback(bot);
       }
 
@@ -183,7 +171,7 @@ namespace topgg {
        * @param callback The callback function that returns the current stats.
        * @throw std::invalid_argument Throws if the delay argument is shorter than 15 minutes.
        */
-      inline custom(std::shared_ptr<dpp::cluster>& cluster, const std::string& token, const time_t delay, std::function<::topgg::stats(dpp::cluster*)>&& callback)
+      inline custom(dpp::cluster& cluster, const std::string& token, const time_t delay, custom_autopost_callback&& callback)
         : base(cluster, token, delay), m_callback(callback) {}
 
       /**
