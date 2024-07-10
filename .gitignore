@@ -1,6 +1,7 @@
 **/*.deb
 **/*.rpm
-
+.idea
+cmake-build-debug/
 include/dpp/
 build/
 deps/
