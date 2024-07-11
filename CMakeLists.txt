@@ -13,19 +13,18 @@ file(GLOB TOPGG_SOURCE_FILES src/*.cpp)
 
 add_library(topgg SHARED ${TOPGG_SOURCE_FILES})
 
+if(ENABLE_CORO)
+set(TOPGG_CXX_STANDARD 20)
+target_compile_definitions(topgg PUBLIC DPP_CORO=ON)
+else()
+set(TOPGG_CXX_STANDARD 17)
+endif()
+
 set_target_properties(topgg PROPERTIES
   OUTPUT_NAME           topgg
-  CXX_STANDARD          17
+  CXX_STANDARD          ${TOPGG_CXX_STANDARD}
   CXX_STANDARD_REQUIRED ON
 )
-
-if (ENABLE_CORO)
-    target_compile_definitions(topgg PUBLIC DPP_CORO=ON)
-    set_target_properties(topgg PROPERTIES
-            CXX_STANDARD 20
-            CXX_STANDARD_REQUIRED ON
-    )
-endif()
 
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
@@ -42,6 +41,7 @@ endif()
 if(WIN32)
 target_compile_definitions(topgg PRIVATE TOPGG_SHARED)
 target_compile_definitions(topgg PRIVATE __TOPGG_BUILDING__)
+target_sources(topgg PRIVATE "${CMAKE_SOURCE_DIR}/topgg.rc")
 endif()
 
 target_include_directories(topgg PUBLIC

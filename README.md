@@ -53,96 +53,106 @@ cmake --build build --config Release
 ### Fetching a bot from its Discord ID
 
 ```cpp
-#include <topgg/topgg.h>
-#include <dpp/dpp.h>
-#include <iostream>
+dpp::cluster bot{"your bot token"};
+topgg::client topgg_client{bot, "your top.gg token"};
 
-int main() {
-  dpp::cluster bot{"your bot token"};
-  topgg::client topgg_client{&bot, "your top.gg token"};
+// using C++17 callbacks
+topgg_client.get_bot(264811613708746752, [](const auto& result) {
+  try {
+    const auto topgg_bot = result.get();
+  
+    std::cout << topgg_bot.username << std::endl;
+  } catch (const std::exception& ext) {
+    std::cout << "error: " << ext.what() << std::endl;
+  }
+});
 
-  topgg_client.get_bot(264811613708746752, [](const auto& result) {
-    try {
-      const auto topgg_bot = result.get();
-    
-      std::cout << topgg_bot.username << std::endl;
-    } catch (const std::exception& ext) {
-      std::cout << "error: " << ext.what() << std::endl;
-    }
-  });
-
-  return 0;
+// using C++20 coroutines
+try {
+  const auto result = co_await topgg_client.co_get_bot(264811613708746752);
+  const auto topgg_bot = result.get();
+  
+  std::cout << topgg_bot.username << std::endl;
+} catch (const std::exception& ext) {
+  std::cout << "error: " << ext.what() << std::endl;
 }
 ```
 
 ### Fetching a user from its Discord ID
 
 ```cpp
-#include <topgg/topgg.h>
-#include <dpp/dpp.h>
-#include <iostream>
+dpp::cluster bot{"your bot token"};
+topgg::client topgg_client{bot, "your top.gg token"};
 
-int main() {
-  dpp::cluster bot{"your bot token"};
-  topgg::client topgg_client{&bot, "your top.gg token"};
+// using C++17 callbacks
+topgg_client.get_user(264811613708746752, [](const auto& result) {
+  try {
+    const auto user = result.get();
+  
+    std::cout << user.username << std::endl;
+  } catch (const std::exception& ext) {
+    std::cout << "error: " << ext.what() << std::endl;
+  }
+});
 
-  topgg_client.get_user(661200758510977084, [](const auto& result) {
-    try {
-      const auto user = result.get();
-    
-      std::cout << user.username << std::endl;
-    } catch (const std::exception& ext) {
-      std::cout << "error: " << ext.what() << std::endl;
-    }
-  });
-
-  return 0;
+// using C++20 coroutines
+try {
+  const auto result = co_await topgg_client.co_get_user(661200758510977084);
+  const auto user = result.get();
+  
+  std::cout << user.username << std::endl;
+} catch (const std::exception& ext) {
+  std::cout << "error: " << ext.what() << std::endl;
 }
 ```
 
 ### Posting your bot's statistics
 
 ```cpp
-#include <topgg/topgg.h>
-#include <dpp/dpp.h>
-#include <iostream>
+dpp::cluster bot{"your bot token"};
+topgg::client topgg_client{bot, "your top.gg token"};
 
-int main() {
-  dpp::cluster bot{"your bot token"};
-  topgg::client topgg_client{&bot, "your top.gg token"};
-
-  const size_t server_count = 12345;
-
-  topgg_client.post_stats(topgg::stats{server_count}, []() {
+// using C++17 callbacks
+topgg_client.post_stats([](const auto success) {
+  if (success) {
     std::cout << "stats posted!" << std::endl;
-  });
+  }
+});
 
-  return 0;
+// using C++20 coroutines
+const auto success = co_await topgg_client.post_stats();
+
+if (success) {
+  std::cout << "stats posted!" << std::endl;
 }
 ```
 
 ### Checking if a user has voted your bot
 
 ```cpp
-#include <topgg/topgg.h>
-#include <dpp/dpp.h>
-#include <iostream>
+dpp::cluster bot{"your bot token"};
+topgg::client topgg_client{bot, "your top.gg token"};
 
-int main() {
-  dpp::cluster bot{"your bot token"};
-  topgg::client topgg_client{&bot, "your top.gg token"};
-
-  topgg_client.has_voted(661200758510977084, [](const auto& result) {
-    try {
-      if (result.get()) {
-        std::cout << "checks out" << std::endl;
-      }
-    } catch (const std::exception& ext) {
-      std::cout << "error: " << ext.what() << std::endl;
+// using C++17 callbacks
+topgg_client.has_voted(661200758510977084, [](const auto& result) {
+  try {
+    if (result.get()) {
+      std::cout << "checks out" << std::endl;
     }
-  });
+  } catch (const std::exception& ext) {
+    std::cout << "error: " << ext.what() << std::endl;
+  }
+});
 
-  return 0;
+// using C++20 coroutines
+try {
+  const auto result = co_await topgg_client.has_voted(661200758510977084);
+
+  if (result.get()) {
+    std::cout << "checks out" << std::endl;
+  }
+} catch (const std::exception& ext) {
+  std::cout << "error: " << ext.what() << std::endl;
 }
 ```
 
@@ -151,18 +161,10 @@ int main() {
 If you want for the SDK to automatically retrieve the server count itself by listening to Discord's gateway events, use `topgg::autoposter::cached`!
 
 ```cpp
-#include <topgg/topgg.h>
-#include <dpp/dpp.h>
+dpp::cluster bot{"your bot token"};
+topgg::client topgg_client{bot, "your top.gg token"};
 
-int main() {
-  std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
-  
-  topgg::autoposter::cached autoposter{bot, "your top.gg token", std::chrono::minutes(15)};
-
-  // your bot's code...
-
-  return 0;
-}
+topgg_client.start_autoposter();
 ```
 
 ### Stats-fed autoposting
@@ -170,20 +172,10 @@ int main() {
 If you want to use your own function (e.g: retrieve the server count on your own by making an SQL query), then you can use `topgg::autoposter::custom`!
 
 ```cpp
-#include <topgg/topgg.h>
-#include <dpp/dpp.h>
+dpp::cluster bot{"your bot token"};
+topgg::client topgg_client{bot, "your top.gg token"};
 
-static topgg::stats fetch_stats(dpp::cluster* bot) {
-  // fetch server count here...
-}
-
-int main() {
-  std::shared_ptr<dpp::cluster> bot{new dpp::cluster{"your bot token"}};
-  
-  topgg::autoposter::custom autoposter{bot, "your top.gg token", std::chrono::minutes(15), fetch_stats};
-
-  // your bot's code...
-
-  return 0;
-}
+topgg_client.start_autoposter([](dpp::cluster& bot_inner) {
+  return topgg::stats{...};
+});
 ```

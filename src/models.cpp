@@ -33,7 +33,7 @@ static void strptime(const char* s, const char* f, tm* t) {
   prop = j[#name].template get<type>()
 
 #define IGNORE_EXCEPTION(scope) \
-  try scope catch (TOPGG_UNUSED const std::exception& _) {}
+  try scope catch (TOPGG_UNUSED const std::exception&) {}
 
 #define DESERIALIZE_VECTOR(j, name, type)                  \
   IGNORE_EXCEPTION({                                       \
@@ -88,7 +88,7 @@ account::account(const dpp::json& j) {
     const char* ext = hash.rfind("a_", 0) == 0 ? "gif" : "png";
 
     avatar = "https://cdn.discordapp.com/avatars/" + std::to_string(id) + "/" + hash + "." + ext + "?size=1024";
-  } catch (TOPGG_UNUSED const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception&) {
     avatar = "https://cdn.discordapp.com/embed/avatars/" + std::to_string((id >> 22) % 5) + ".png";
   }
 
@@ -131,7 +131,7 @@ bot::bot(const dpp::json& j)
 
   try {
     DESERIALIZE(j, invite, std::string);
-  } catch (TOPGG_UNUSED const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception&) {
     invite = "https://discord.com/oauth2/authorize?scope=bot&client_id=" + std::to_string(id);
   }
 
@@ -145,13 +145,13 @@ bot::bot(const dpp::json& j)
 
   try {
     DESERIALIZE(j, shard_count, size_t);
-  } catch (TOPGG_UNUSED const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception&) {
     shard_count = shards.size();
   }
 
   try {
     url.append(j["vanity"].template get<std::string>());
-  } catch (TOPGG_UNUSED const std::exception& _) {
+  } catch (TOPGG_UNUSED const std::exception&) {
     url.append(std::to_string(id));
   }
 }
@@ -161,6 +161,25 @@ stats::stats(const dpp::json& j) {
   DESERIALIZE_PRIVATE_OPTIONAL(j, server_count, size_t);
   DESERIALIZE_PRIVATE_OPTIONAL(j, shards, std::vector<size_t>);
   DESERIALIZE_PRIVATE_OPTIONAL(j, shard_id, size_t);
+}
+
+stats::stats(dpp::cluster& bot) {
+  std::vector<size_t> shards_server_count{};
+  size_t servers{};
+  
+  shards_server_count.reserve(bot.numshards);
+  
+  for (auto& s: bot.get_shards()) {
+    const auto server_count = s.second->get_guild_count();
+    
+    servers += server_count;
+    shards_server_count.push_back(server_count);
+  }
+  
+  m_server_count = std::optional{servers};
+  m_shards = std::optional{shards_server_count};
+  m_shard_id = std::optional{0};
+  m_shard_count = std::optional{bot.numshards};
 }
 
 stats::stats(const std::vector<size_t>& shards, const size_t shard_index)

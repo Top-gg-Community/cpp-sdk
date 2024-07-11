@@ -1,0 +1,58 @@
+html {
+  --font-family-monospace: 'Roboto Mono';
+  --separator-color: rgba(0, 0, 0, 0);
+}
+
+#projectname a,
+div.header .title,
+#projectname,
+h1,
+h2.groupheader {
+  font-weight: 900;
+}
+
+a:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#top {
+  border-bottom: none;
+}
+
+div.contents {
+  margin: 0px auto var(--spacing-medium) auto;
+  padding-bottom: var(--spacing-large);
+}
+
+@media screen and (min-width: 768px) {
+  html,
+  body {
+    position: relative;
+    height: 100%;
+  }
+
+  #apis {
+    position: relative;
+    height: calc(100% - var(--top-height) + var(--spacing-large));
+  }
+
+  #top {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+    height: 100%;
+  }
+  
+  #doc-content {
+    position: relative;
+    top: calc(var(--top-height) - 100%);
+    padding-top: 0px;
+    height: 100% !important;
+  }
+}
+
+#nav-path,
+#nav-sync {
+  display: none;
+}
