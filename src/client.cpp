@@ -17,7 +17,7 @@ void client::get_bot(const dpp::snowflake bot_id, const topgg::get_bot_completio
 
 #ifdef DPP_CORO
 topgg::async_result<topgg::bot> client::co_get_bot(const dpp::snowflake bot_id) {
-  return topgg::async_result<topgg::bot>{ [this, bot_id] <typename C> (C &&cc) { return get_bot(bot_id, std::forward<C>(cc)); }};
+  return topgg::async_result<topgg::bot>{ [this, bot_id] <typename C> (C&& cc) { return get_bot(bot_id, std::forward<C>(cc)); }};
 }
 #endif
 
@@ -29,7 +29,7 @@ void client::get_user(const dpp::snowflake user_id, const topgg::get_user_comple
 
 #ifdef DPP_CORO
 topgg::async_result<topgg::user> client::co_get_user(const dpp::snowflake user_id) {
-  return topgg::async_result<topgg::user>{ [this, user_id] <typename C> (C &&cc) { return get_user(user_id, std::forward<C>(cc)); }};
+  return topgg::async_result<topgg::user>{ [this, user_id] <typename C> (C&& cc) { return get_user(user_id, std::forward<C>(cc)); }};
 }
 #endif
 
@@ -39,7 +39,7 @@ void client::post_stats(const topgg::post_stats_completion_t& callback)  {
 
 #ifdef DPP_CORO
 dpp::async<bool> client::co_post_stats() {
-  return dpp::async<bool>{ [this] <typename C> (C &&cc) { return post_stats(stats{m_cluster}, std::forward<C>(cc)); }};
+  return dpp::async<bool>{ [this] <typename C> (C&& cc) { return post_stats(stats{m_cluster}, std::forward<C>(cc)); }};
 }
 #endif
 
@@ -54,7 +54,7 @@ void client::post_stats(const stats& s, const topgg::post_stats_completion_t& ca
 
 #ifdef DPP_CORO
 dpp::async<bool> client::co_post_stats(const stats& s) {
-  return dpp::async<bool>{ [this, s] <typename C> (C &&cc) { return post_stats(s, std::forward<C>(cc)); }};
+  return dpp::async<bool>{ [this, s] <typename C> (C&& cc) { return post_stats(s, std::forward<C>(cc)); }};
 }
 #endif
 
@@ -66,7 +66,7 @@ void client::get_stats(const topgg::get_stats_completion_t& callback) {
 
 #ifdef DPP_CORO
 topgg::async_result<topgg::stats> client::co_get_stats() {
-  return topgg::async_result<topgg::stats>{ [this] <typename C> (C &&cc) { return get_stats(std::forward<C>(cc)); }};
+  return topgg::async_result<topgg::stats>{ [this] <typename C> (C&& cc) { return get_stats(std::forward<C>(cc)); }};
 }
 #endif
 
@@ -84,7 +84,7 @@ void client::get_voters(const topgg::get_voters_completion_t& callback) {
 
 #ifdef DPP_CORO
 topgg::async_result<std::vector<topgg::voter>> client::co_get_voters() {
-  return topgg::async_result<std::vector<topgg::voter>>{ [this] <typename C> (C &&cc) { return get_voters(std::forward<C>(cc)); }};
+  return topgg::async_result<std::vector<topgg::voter>>{ [this] <typename C> (C&& cc) { return get_voters(std::forward<C>(cc)); }};
 }
 #endif
 
@@ -97,7 +97,7 @@ void client::has_voted(const dpp::snowflake user_id, const topgg::has_voted_comp
 
 #ifdef DPP_CORO
 topgg::async_result<bool> client::co_has_voted(const dpp::snowflake user_id) {
-  return topgg::async_result<bool>{ [user_id, this] <typename C> (C &&cc) { return has_voted(user_id, std::forward<C>(cc)); }};
+  return topgg::async_result<bool>{ [user_id, this] <typename C> (C&& cc) { return has_voted(user_id, std::forward<C>(cc)); }};
 }
 #endif
 
@@ -109,7 +109,7 @@ void client::is_weekend(const topgg::is_weekend_completion_t& callback) {
 
 #ifdef DPP_CORO
 topgg::async_result<bool> client::co_is_weekend() {
-  return topgg::async_result<bool>{ [this] <typename C> (C &&cc) { return is_weekend(std::forward<C>(cc)); }};
+  return topgg::async_result<bool>{ [this] <typename C> (C&& cc) { return is_weekend(std::forward<C>(cc)); }};
 }
 #endif
 
