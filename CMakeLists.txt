@@ -26,6 +26,8 @@ set_target_properties(topgg PROPERTIES
   CXX_STANDARD_REQUIRED ON
 )
 
+target_compile_definitions(topgg PRIVATE __TOPGG_BUILDING__)
+
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -39,8 +41,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Wpedantic -Wformat=2 
 endif()
 
 if(WIN32)
-target_compile_definitions(topgg PRIVATE TOPGG_SHARED)
-target_compile_definitions(topgg PRIVATE __TOPGG_BUILDING__)
 target_sources(topgg PRIVATE "${CMAKE_SOURCE_DIR}/topgg.rc")
 endif()
 

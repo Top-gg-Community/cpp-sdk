@@ -4,7 +4,9 @@ The official C++ SDK for the [Top.gg API](https://docs.top.gg).
 
 ## Building from source
 
-Linux (Debian-like):
+**NOTE:** To enable C++20 coroutine methods, add `-DENABLE_CORO=ON`!
+
+### Linux (Debian-like)
 
 ```sh
 # install D++
@@ -16,7 +18,7 @@ cmake -B build .
 cmake --build build --config Release
 ```
 
-Linux (CentOS-like):
+### Linux (CentOS-like)
 
 ```sh
 # install D++
@@ -29,7 +31,7 @@ cmake -B build .
 cmake --build build --config Release
 ```
 
-macOS:
+### macOS
 
 ```sh
 # install D++
@@ -41,7 +43,7 @@ cmake -B build .
 cmake --build build --config Release
 ```
 
-Windows:
+### Windows
 
 ```bat
 cmake -B build .
@@ -62,19 +64,18 @@ topgg_client.get_bot(264811613708746752, [](const auto& result) {
     const auto topgg_bot = result.get();
   
     std::cout << topgg_bot.username << std::endl;
-  } catch (const std::exception& ext) {
-    std::cout << "error: " << ext.what() << std::endl;
+  } catch (const std::exception& exc) {
+    std::cout << "error: " << exc.what() << std::endl;
   }
 });
 
 // using C++20 coroutines
 try {
-  const auto result = co_await topgg_client.co_get_bot(264811613708746752);
-  const auto topgg_bot = result.get();
+  const auto topgg_bot = co_await topgg_client.co_get_bot(264811613708746752);
   
   std::cout << topgg_bot.username << std::endl;
-} catch (const std::exception& ext) {
-  std::cout << "error: " << ext.what() << std::endl;
+} catch (const std::exception& exc) {
+  std::cout << "error: " << exc.what() << std::endl;
 }
 ```
 
@@ -90,19 +91,18 @@ topgg_client.get_user(264811613708746752, [](const auto& result) {
     const auto user = result.get();
   
     std::cout << user.username << std::endl;
-  } catch (const std::exception& ext) {
-    std::cout << "error: " << ext.what() << std::endl;
+  } catch (const std::exception& exc) {
+    std::cout << "error: " << exc.what() << std::endl;
   }
 });
 
 // using C++20 coroutines
 try {
-  const auto result = co_await topgg_client.co_get_user(661200758510977084);
-  const auto user = result.get();
+  const auto user = co_await topgg_client.co_get_user(661200758510977084);
   
   std::cout << user.username << std::endl;
-} catch (const std::exception& ext) {
-  std::cout << "error: " << ext.what() << std::endl;
+} catch (const std::exception& exc) {
+  std::cout << "error: " << exc.what() << std::endl;
 }
 ```
 
@@ -139,20 +139,20 @@ topgg_client.has_voted(661200758510977084, [](const auto& result) {
     if (result.get()) {
       std::cout << "checks out" << std::endl;
     }
-  } catch (const std::exception& ext) {
-    std::cout << "error: " << ext.what() << std::endl;
+  } catch (const std::exception& exc) {
+    std::cout << "error: " << exc.what() << std::endl;
   }
 });
 
 // using C++20 coroutines
 try {
-  const auto result = co_await topgg_client.co_has_voted(661200758510977084);
+  const auto voted = co_await topgg_client.co_has_voted(661200758510977084);
 
-  if (result.get()) {
+  if (voted) {
     std::cout << "checks out" << std::endl;
   }
-} catch (const std::exception& ext) {
-  std::cout << "error: " << ext.what() << std::endl;
+} catch (const std::exception& exc) {
+  std::cout << "error: " << exc.what() << std::endl;
 }
 ```
 

@@ -94,10 +94,10 @@ namespace topgg {
     dpp::timer m_autoposter_timer;
 
     template<typename T>
-    void basic_request(const std::string& url, const std::function<void(const result<T>&)>& callback, const std::function<T(const dpp::json&)>& conversion_fn) {
-      m_cluster.request("https://top.gg/api" + url, dpp::m_get, [callback, conversion_fn](const auto& response) { callback(result<T>{response, conversion_fn}); }, "", "application/json", m_headers);
+    void basic_request(const std::string& url, const std::function<void(const result<T>&)>& callback, std::function<T(const dpp::json&)>&& conversion_fn) {
+      m_cluster.request("https://top.gg/api" + url, dpp::m_get, [callback, conversion_fn_in = std::move(conversion_fn)](const auto& response) { callback(result<T>{response, conversion_fn_in}); }, "", "application/json", m_headers);
     }
-
+    
   public:
     client() = delete;
 
@@ -109,6 +109,40 @@ namespace topgg {
      * @since 2.0.0
      */
     client(dpp::cluster& cluster, const std::string& token);
+
+    /**
+     * @brief This object can't be copied.
+     *
+     * @param other Other object to copy from.
+     * @since 2.0.0
+     */
+    client(const client& other) = delete;
+
+    /**
+     * @brief This object can't be moved.
+     *
+     * @param other Other object to move from.
+     * @since 2.0.0
+     */
+    client(client&& other) = delete;
+
+    /**
+     * @brief This object can't be copied.
+     *
+     * @param other Other object to copy from.
+     * @return client The current modified object.
+     * @since 2.0.0
+     */
+    client& operator=(const client& other) = delete;
+
+    /**
+     * @brief This object can't be moved.
+     *
+     * @param other Other object to move from.
+     * @return client The current modified object.
+     * @since 2.0.0
+     */
+    client& operator=(client&& other) = delete;
 
     /**
      * @brief Fetches a listed Discord bot from a Discord ID.
@@ -124,8 +158,8 @@ namespace topgg {
      *     const auto topgg_bot = result.get();
      *
      *     std::cout << topgg_bot.username << std::endl;
-     *   } catch (const std::exception& ext) {
-     *     std::cout << "error: " << ext.what() << std::endl;
+     *   } catch (const std::exception& exc) {
+     *     std::cout << "error: " << exc.what() << std::endl;
      *   }
      * });
      * ```
@@ -150,25 +184,29 @@ namespace topgg {
      * dpp::cluster bot{"your bot token"};
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
-     * auto result = co_await topgg_client.get_bot(264811613708746752);
-     *
      * try {
-     *   const auto topgg_bot = result.get();
+     *   const auto topgg_bot = co_await topgg_client.co_get_bot(264811613708746752);
+     *
      *   std::cout << topgg_bot.username << std::endl;
-     * } catch (const std::exception& ext) {
-     *   std::cout << "error: " << ext.what() << std::endl;
+     * } catch (const std::exception& exc) {
+     *   std::cout << "error: " << exc.what() << std::endl;
      * }
      * ```
      *
      * @param bot_id The Discord bot ID to fetch from.
-     * @return co_await to retrieve a topgg::result<topgg::bot>
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return co_await to retrieve a topgg::bot if successful
      * @note For its C++17 callback-based counterpart, see get_bot.
-     * @see topgg::result
+     * @see topgg::async_result
      * @see topgg::bot
      * @see topgg::client::get_bot
      * @since 2.0.0
      */
-    dpp::async<topgg::result<topgg::bot>> co_get_bot(const dpp::snowflake bot_id);
+    topgg::async_result<topgg::bot> co_get_bot(const dpp::snowflake bot_id);
 #endif
 
     /**
@@ -185,8 +223,8 @@ namespace topgg {
      *     const auto user = result.get();
      *
      *     std::cout << user.username << std::endl;
-     *   } catch (const std::exception& ext) {
-     *     std::cout << "error: " << ext.what() << std::endl;
+     *   } catch (const std::exception& exc) {
+     *     std::cout << "error: " << exc.what() << std::endl;
      *   }
      * });
      * ```
@@ -211,25 +249,29 @@ namespace topgg {
      * dpp::cluster bot{"your bot token"};
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
-     * const auto result = co_await topgg_client.get_user(661200758510977084);
-     *
      * try {
-     *   const auto user = result.get();
+     *   const auto user = co_await topgg_client.co_get_user(661200758510977084);
+     *
      *   std::cout << user.username << std::endl;
-     * } catch (const std::exception& ext) {
-     *   std::cout << "error: " << ext.what() << std::endl;
+     * } catch (const std::exception& exc) {
+     *   std::cout << "error: " << exc.what() << std::endl;
      * }
      * ```
      *
      * @param user_id The Discord user ID to fetch from.
-     * @return co_await to retrieve a topgg::result<topgg::user>
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return co_await to retrieve a topgg::user if successful
      * @note For its C++17 callback-based counterpart, see get_user.
-     * @see topgg::result
+     * @see topgg::async_result
      * @see topgg::bot
      * @see topgg::client::get_user
      * @since 2.0.0
      */
-    dpp::async<topgg::result<topgg::user>> co_get_user(const dpp::snowflake user_id);
+    topgg::async_result<topgg::user> co_get_user(const dpp::snowflake user_id);
 #endif
 
     /**
@@ -246,8 +288,8 @@ namespace topgg {
      *     auto stats = result.get();
      *
      *     std::cout << stats.server_count().value_or(0) << std::endl;
-     *   } catch (const std::exception& ext) {
-     *     std::cout << "error: " << ext.what() << std::endl;
+     *   } catch (const std::exception& exc) {
+     *     std::cout << "error: " << exc.what() << std::endl;
      *   }
      * });
      * ```
@@ -255,7 +297,6 @@ namespace topgg {
      * @param callback The callback function to call when get_stats completes.
      * @note For its C++20 coroutine counterpart, see co_get_stats.
      * @see topgg::result
-     * @see topgg::stats
      * @see topgg::client::start_autoposter
      * @see topgg::client::co_get_stats
      * @since 2.0.0
@@ -272,25 +313,28 @@ namespace topgg {
      * dpp::cluster bot{"your bot token"};
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
-     * const auto result = co_await topgg_client.get_stats();
-     *
      * try {
-     *   auto stats = result.get();
+     *   const auto stats = co_await topgg_client.co_get_stats();
+     *
      *   std::cout << stats.server_count().value_or(0) << std::endl;
-     * } catch (const std::exception& ext) {
-     *   std::cout << "error: " << ext.what() << std::endl;
+     * } catch (const std::exception& exc) {
+     *   std::cout << "error: " << exc.what() << std::endl;
      * }
      * ```
      *
-     * @return co_await to retrieve a topgg::result<topgg::stats>
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return co_await to retrieve a topgg::stats if successful
      * @note For its C++17 callback-based counterpart, see get_stats.
-     * @see topgg::result
-     * @see topgg::stats
+     * @see topgg::async_result
      * @see topgg::client::start_autoposter
      * @see topgg::client::get_stats
      * @since 2.0.0
      */
-    dpp::async<topgg::result<topgg::stats>> co_get_stats();
+    topgg::async_result<topgg::stats> co_get_stats();
 #endif
 
     /**
@@ -309,8 +353,8 @@ namespace topgg {
      *     for (auto& voter: voters) {
      *       std::cout << voter.username << std::endl;
      *     }
-     *   } catch (const std::exception& ext) {
-     *     std::cout << "error: " << ext.what() << std::endl;
+     *   } catch (const std::exception& exc) {
+     *     std::cout << "error: " << exc.what() << std::endl;
      *   }
      * });
      * ```
@@ -336,28 +380,32 @@ namespace topgg {
      * dpp::cluster bot{"your bot token"};
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
-     * const auto result = co_await topgg_client.get_voters();
-     *
      * try {
-     *   auto voters = result.get();
-     *   for (auto& voter: voters) {
+     *   const auto voters = co_await topgg_client.co_get_voters();
+     *
+     *   for (const auto& voter: voters) {
      *     std::cout << voter.username << std::endl;
      *   }
-     * } catch (const std::exception& ext) {
-     *   std::cout << "error: " << ext.what() << std::endl;
+     * } catch (const std::exception& exc) {
+     *   std::cout << "error: " << exc.what() << std::endl;
      * }
      * ```
      *
-     * @return co_await to retrieve a topgg::result<topgg::stats>
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return co_await to retrieve a std::vector<voter> if successful
      * @note For its C++17 callback-based counterpart, see get_voters.
-     * @see topgg::result
+     * @see topgg::async_result
      * @see topgg::voter
      * @see topgg::stats
      * @see topgg::client::start_autoposter
      * @see topgg::client::get_voters
      * @since 2.0.0
      */
-    dpp::async<topgg::result<std::vector<voter>>> co_get_voters();
+    topgg::async_result<std::vector<voter>> co_get_voters();
 #endif
 
     /**
@@ -374,8 +422,8 @@ namespace topgg {
      *     if (result.get()) {
      *       std::cout << "checks out" << std::endl;
      *     }
-     *   } catch (const std::exception& ext) {
-     *     std::cout << "error: " << ext.what() << std::endl;
+     *   } catch (const std::exception& exc) {
+     *     std::cout << "error: " << exc.what() << std::endl;
      *   }
      * });
      * ```
@@ -401,27 +449,32 @@ namespace topgg {
      * dpp::cluster bot{"your bot token"};
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
-     * const auto result = co_await topgg_client.has_voted(661200758510977084);
-     *
      * try {
-     *   if (result.get()) {
+     *   const auto voted = co_await topgg_client.co_has_voted(661200758510977084);
+     *
+     *   if (voted) {
      *     std::cout << "checks out" << std::endl;
      *   }
-     * } catch (const std::exception& ext) {
-     *   std::cout << "error: " << ext.what() << std::endl;
+     * } catch (const std::exception& exc) {
+     *   std::cout << "error: " << exc.what() << std::endl;
      * }
      * ```
      *
      * @param user_id The Discord user ID to check from.
-     * @return co_await to retrieve a topgg::result<bool>
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return co_await to retrieve a bool if successful
      * @note For its C++17 callback-based counterpart, see has_voted.
-     * @see topgg::result
+     * @see topgg::async_result
      * @see topgg::stats
      * @see topgg::client::start_autoposter
      * @see topgg::client::has_voted
      * @since 2.0.0
      */
-    dpp::async<topgg::result<bool>> co_has_voted(const dpp::snowflake user_id);
+    topgg::async_result<bool> co_has_voted(const dpp::snowflake user_id);
 #endif
 
     /**
@@ -438,8 +491,8 @@ namespace topgg {
      *     if (result.get()) {
      *       std::cout << "the weekend multiplier is active" << std::endl;
      *     }
-     *   } catch (const std::exception& ext) {
-     *     std::cout << "error: " << ext.what() << std::endl;
+     *   } catch (const std::exception& exc) {
+     *     std::cout << "error: " << exc.what() << std::endl;
      *   }
      * });
      * ```
@@ -462,24 +515,29 @@ namespace topgg {
      * dpp::cluster bot{"your bot token"};
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
-     * const auto result = co_await topgg_client.is_weekend();
-     *
      * try {
-     *   if (result.get()) {
+     *   const auto is_weekend = co_await topgg_client.co_is_weekend();
+     *
+     *   if (is_weekend) {
      *     std::cout << "the weekend multiplier is active" << std::endl;
      *   }
-     * } catch (const std::exception& ext) {
-     *   std::cout << "error: " << ext.what() << std::endl;
+     * } catch (const std::exception& exc) {
+     *   std::cout << "error: " << exc.what() << std::endl;
      * }
      * ```
      *
-     * @return co_await to retrieve a topgg::result<bool>
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return co_await to retrieve a bool if successful
      * @note For its C++17 callback-based counterpart, see is_weekend.
-     * @see topgg::result
+     * @see topgg::async_result
      * @see topgg::client::is_weekend
      * @since 2.0.0
      */
-    dpp::async<topgg::result<bool>> co_is_weekend();
+    topgg::async_result<bool> co_is_weekend();
 #endif
 
     /**
@@ -501,7 +559,6 @@ namespace topgg {
      * @param callback The callback function to call when post_stats completes.
      * @note For its C++20 coroutine counterpart, see co_post_stats.
      * @see topgg::result
-     * @see topgg::stats
      * @see topgg::client::start_autoposter
      * @see topgg::client::co_post_stats
      * @since 2.0.0
@@ -518,7 +575,7 @@ namespace topgg {
      * dpp::cluster bot{"your bot token"};
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
-     * const auto success = co_await topgg_client.post_stats();
+     * const auto success = co_await topgg_client.co_post_stats();
      *
      * if (success) {
      *   std::cout << "stats posted!" << std::endl;
@@ -527,8 +584,6 @@ namespace topgg {
      *
      * @return co_await to retrieve a bool
      * @note For its C++17 callback-based counterpart, see post_stats.
-     * @see topgg::result
-     * @see topgg::stats
      * @see topgg::client::start_autoposter
      * @see topgg::client::post_stats
      * @since 2.0.0
@@ -576,7 +631,7 @@ namespace topgg {
      * topgg::client topgg_client{bot, "your top.gg token"};
      *
      * const size_t server_count = 12345;
-     * const auto success = co_await topgg_client.post_stats(topgg::stats{server_count});
+     * const auto success = co_await topgg_client.co_post_stats(topgg::stats{server_count});
      *
      * if (success) {
      *   std::cout << "stats posted!" << std::endl;
@@ -586,7 +641,6 @@ namespace topgg {
      * @param s Your Discord bot's statistics.
      * @return co_await to retrieve a bool
      * @note For its C++17 callback-based counterpart, see post_stats.
-     * @see topgg::result
      * @see topgg::stats
      * @see topgg::client::start_autoposter
      * @see topgg::client::post_stats

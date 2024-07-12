@@ -10,7 +10,7 @@
 
 #pragma once
 
-#if defined(_WIN32) && defined(TOPGG_SHARED)
+#ifdef _WIN32
 #ifdef __TOPGG_BUILDING__
 #include <dpp/win32_safe_warnings.h>
 #define TOPGG_EXPORT __declspec(dllexport)

@@ -16,6 +16,10 @@
 #include <stdexcept>
 #include <variant>
 
+#ifdef DPP_CORO
+#include <utility>
+#endif
+
 namespace topgg {
   class internal_result;
 
@@ -101,6 +105,7 @@ namespace topgg {
    * @brief A result class that gets returned from every HTTP response.
    * This class may either contain the desired data or an error.
    *
+   * @see topgg::async_result
    * @since 2.0.0
    */
   template<typename T>
@@ -109,7 +114,7 @@ namespace topgg {
     const std::function<T(dpp::json& json)> m_parse_fn;
 
     inline result(const dpp::http_request_completion_t& response, const std::function<T(const dpp::json&)>& parse_fn)
-      : m_internal(internal_result{response}), m_parse_fn(parse_fn) {}
+      : m_internal(response), m_parse_fn(parse_fn) {}
 
   public:
     result() = delete;
@@ -133,4 +138,108 @@ namespace topgg {
 
     friend class client;
   };
+
+#ifdef DPP_CORO
+  /**
+   * @brief An async result class that gets returned from every C++20 coroutine HTTP response.
+   * This class may either contain the desired data or an error.
+   *
+   * @see topgg::result
+   * @since 2.0.0
+   */
+  template<typename T>
+  class TOPGG_EXPORT async_result {
+    dpp::async<result<T>> m_fut;
+    
+    template<class F>
+    inline async_result(F&& cb): m_fut(std::forward<F>(cb)) {}
+    
+  public:
+    async_result() = delete;
+    
+    /**
+     * @brief This object can't be copied.
+     *
+     * @param other Other object to copy from.
+     * @since 2.0.0
+     */
+    async_result(const async_result& other) = delete;
+
+    /**
+     * @brief Moves data from another object.
+     *
+     * @param other Other object to move from.
+     * @since 2.0.0
+     */
+    async_result(async_result&& other) noexcept = default;
+
+    /**
+     * @brief This object can't be copied.
+     *
+     * @param other Other object to copy from.
+     * @return async_result The current modified object.
+     * @since 2.0.0
+     */
+    async_result& operator=(const async_result& other) = delete;
+  
+    /**
+     * @brief Moves data from another object.
+     *
+     * @param other Other object to move from.
+     * @return async_result The current modified object.
+     * @since 2.0.0
+     */
+    async_result& operator=(async_result&& other) noexcept = default;
+  
+    /**
+     * @brief Suspends the caller and tries to retrieve the fetched data.
+     *
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return T The desired data, if successful.
+     * @see topgg::result::get
+     * @since 2.0.0
+     */
+    inline T& operator co_await() & {
+      return m_fut.operator co_await().get();
+    }
+    
+    /**
+     * @brief Suspends the caller and tries to retrieve the fetched data.
+     *
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return T The desired data, if successful.
+     * @see topgg::result::get
+     * @since 2.0.0
+     */
+    inline const T& operator co_await() const & {
+      return m_fut.operator co_await().get();
+    }
+    
+    /**
+     * @brief Suspends the caller and tries to retrieve the fetched data.
+     *
+     * @throw topgg::internal_server_error Thrown when the client receives an unexpected error from Top.gg's end.
+     * @throw topgg::invalid_token Thrown when its known that the client uses an invalid Top.gg API token.
+     * @throw topgg::not_found Thrown when such query does not exist.
+     * @throw topgg::ratelimited Thrown when the client gets ratelimited from sending more HTTP requests.
+     * @throw dpp::http_error Thrown when an unexpected HTTP exception occured.
+     * @return T The desired data, if successful.
+     * @see topgg::result::get
+     * @since 2.0.0
+     */
+    inline T&& operator co_await() && {
+      return std::forward<dpp::async<result<T>>>(m_fut).operator co_await().get();
+    }
+    
+    friend class client;
+  };
+#endif
 }; // namespace topgg

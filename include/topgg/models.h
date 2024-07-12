@@ -243,10 +243,6 @@ namespace topgg {
     friend class client;
   };
 
-  namespace autoposter {
-    class base;
-  }; // namespace autoposter
-
   /**
    * @brief Represents a Discord bot’s statistics.
    *
@@ -329,7 +325,6 @@ namespace topgg {
     }
 
     friend class client;
-    friend class autoposter::base;
   };
 
   class user;
