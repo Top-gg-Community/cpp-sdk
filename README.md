@@ -120,7 +120,7 @@ topgg_client.post_stats([](const auto success) {
 });
 
 // using C++20 coroutines
-const auto success = co_await topgg_client.post_stats();
+const auto success = co_await topgg_client.co_post_stats();
 
 if (success) {
   std::cout << "stats posted!" << std::endl;
@@ -146,7 +146,7 @@ topgg_client.has_voted(661200758510977084, [](const auto& result) {
 
 // using C++20 coroutines
 try {
-  const auto result = co_await topgg_client.has_voted(661200758510977084);
+  const auto result = co_await topgg_client.co_has_voted(661200758510977084);
 
   if (result.get()) {
     std::cout << "checks out" << std::endl;
