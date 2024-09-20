@@ -240,7 +240,7 @@ user::user(const dpp::json& j)
   DESERIALIZE_OPTIONAL_STRING(j, bio);
   DESERIALIZE_OPTIONAL_STRING(j, banner);
 
-  if (j.contains("contains")) {
+  if (j.contains("socials")) {
     socials = std::optional{user_socials{j["socials"].template get<dpp::json>()}};
   }
 
