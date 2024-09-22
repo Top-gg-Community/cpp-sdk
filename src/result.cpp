@@ -13,7 +13,7 @@ using topgg::ratelimited;
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif
 
-TOPGG_MAYBE_UNUSED static const char* get_dpp_error_message(const dpp::http_error& http_error) {
+[[maybe_unused]] static const char* get_dpp_error_message(const dpp::http_error& http_error) {
   switch (http_error) {
   case dpp::h_unknown:
     return "Status unknown.";

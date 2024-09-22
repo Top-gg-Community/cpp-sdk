@@ -27,10 +27,6 @@
 #define TOPGG_UNUSED
 #endif
 
-#ifdef __TOPGG_BUILDING__
-#define TOPGG_MAYBE_UNUSED [[maybe_unused]]
-#endif
-
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
