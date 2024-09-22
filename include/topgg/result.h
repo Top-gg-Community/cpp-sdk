@@ -108,7 +108,7 @@ namespace topgg {
   template<typename T>
   class TOPGG_EXPORT result {
     const internal_result m_internal;
-    const std::function<T(dpp::json& json)> m_parse_fn;
+    const std::function<T(const dpp::json& json)> m_parse_fn;
 
     inline result(const dpp::http_request_completion_t& response, const std::function<T(const dpp::json&)>& parse_fn)
       : m_internal(response), m_parse_fn(parse_fn) {}
