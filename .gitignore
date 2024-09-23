@@ -2,6 +2,9 @@
 **/*.rpm
 .idea
 cmake-build-debug/
+
+.vscode/
 include/dpp/
 build/
 deps/
+docs/html/

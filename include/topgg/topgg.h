@@ -1,7 +1,25 @@
+/**
+ * @module topgg
+ * @file topgg.h
+ * @brief The official C++ wrapper for the Top.gg API.
+ * @authors Top.gg, null8626
+ * @copyright Copyright (c) 2024 Top.gg & null8626
+ * @date 2024-09-22
+ * @version 2.0.0
+ */
+
 #pragma once
 
-#if defined(_WIN32) && defined(TOPGG_SHARED)
-#ifdef __TOPGG_BUILDING__
+#ifdef _WIN32
+#if defined(DPP_STATIC) && !defined(TOPGG_STATIC)
+#define TOPGG_STATIC
+#elif defined(TOPGG_STATIC) && !defined(DPP_STATIC)
+#define DPP_STATIC
+#endif
+#endif
+
+#if defined(_WIN32) && !defined(TOPGG_STATIC)
+#ifdef __TOPGG_BUILDING_DLL__
 #include <dpp/win32_safe_warnings.h>
 #define TOPGG_EXPORT __declspec(dllexport)
 #else
@@ -33,4 +51,3 @@
 #include <topgg/result.h>
 #include <topgg/models.h>
 #include <topgg/client.h>
-#include <topgg/autoposter.h>

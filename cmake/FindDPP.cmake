@@ -1,13 +1,14 @@
-if(WIN32 AND NOT EXISTS "${CMAKE_SOURCE_DIR}/deps/dpp.lib")
-execute_process(COMMAND powershell "-NoLogo" "-NoProfile" "-File" ".\\install_dpp_msvc.ps1" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+if(WIN32 AND NOT EXISTS ${CMAKE_SOURCE_DIR}/deps/dpp.lib)
+string(TOLOWER ${CMAKE_BUILD_TYPE} INSTALL_DPP_BUILD_TYPE)
+execute_process(COMMAND powershell "-NoLogo" "-NoProfile" "-File" ".\\install_dpp_msvc.ps1" ${INSTALL_DPP_BUILD_TYPE} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
 if(APPLE)
 find_path(DPP_INCLUDE_DIR NAMES dpp/dpp.h HINTS "/opt/homebrew/include")
 find_library(DPP_LIBRARIES NAMES dpp "libdpp.a" HINTS "/opt/homebrew/lib")
 else()
-find_path(DPP_INCLUDE_DIR NAMES dpp/dpp.h HINTS "${CMAKE_SOURCE_DIR}/include")
-find_library(DPP_LIBRARIES NAMES dpp "libdpp.a" HINTS "${CMAKE_SOURCE_DIR}/deps")
+find_path(DPP_INCLUDE_DIR NAMES dpp/dpp.h HINTS ${CMAKE_SOURCE_DIR}/include)
+find_library(DPP_LIBRARIES NAMES dpp "libdpp.a" HINTS ${CMAKE_SOURCE_DIR}/deps)
 endif()
 
 include(FindPackageHandleStandardArgs)

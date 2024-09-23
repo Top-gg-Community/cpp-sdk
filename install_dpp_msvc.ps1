@@ -1,3 +1,5 @@
+$build_type = $args[0]
+
 if ((Test-Path "C:\Program Files\Microsoft Visual Studio\2022") -or (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2022")) {
   $vscode_year = "2022"
 } else {
@@ -15,7 +17,7 @@ $dpp_release_information = ConvertFrom-Json $dpp_release_information_response.Co
 $failed = $true
 
 foreach ($dpp_release in $dpp_release_information) {
-  if ($dpp_release.name.contains("$windows_arch-release-vs$vscode_year") -and $dpp_release.url.endswith(".zip")) {
+  if ($dpp_release.name.contains("$windows_arch-$build_type-vs$vscode_year") -and $dpp_release.url.endswith(".zip")) {
     $failed = $false
     
     Invoke-WebRequest -Uri $dpp_release.url -OutFile dpp.zip
