@@ -1,10 +1,11 @@
-#include <topgg/topgg.h>
+#include <topgg/models.h>
 
 using topgg::account;
 using topgg::bot;
 using topgg::stats;
 using topgg::user;
 using topgg::user_socials;
+using topgg::voter;
 
 #ifdef _WIN32
 #include <sstream>
@@ -33,7 +34,7 @@ static void strptime(const char* s, const char* f, tm* t) {
   prop = j[#name].template get<type>()
 
 #define IGNORE_EXCEPTION(scope) \
-  try scope catch (TOPGG_UNUSED const std::exception&) {}
+  try scope catch (const std::exception& TOPGG_UNUSED) {}
 
 #define DESERIALIZE_VECTOR(j, name, type)                  \
   IGNORE_EXCEPTION({                                       \
@@ -78,7 +79,7 @@ static void strptime(const char* s, const char* f, tm* t) {
     }                                                             \
   })
 
-account::account(const dpp::json& j) {
+TOPGG_API account::account(const dpp::json& j) {
   id = dpp::snowflake{j["id"].template get<std::string>()};
 
   DESERIALIZE(j, username, std::string);
@@ -88,14 +89,14 @@ account::account(const dpp::json& j) {
     const char* ext = hash.rfind("a_", 0) == 0 ? "gif" : "png";
 
     avatar = "https://cdn.discordapp.com/avatars/" + std::to_string(id) + "/" + hash + "." + ext + "?size=1024";
-  } catch (TOPGG_UNUSED const std::exception&) {
+  } catch (const std::exception& TOPGG_UNUSED) {
     avatar = "https://cdn.discordapp.com/embed/avatars/" + std::to_string((id >> 22) % 5) + ".png";
   }
 
   created_at = static_cast<time_t>(((id >> 22) / 1000) + 1420070400);
 }
 
-bot::bot(const dpp::json& j)
+TOPGG_API bot::bot(const dpp::json& j)
   : account(j), url("https://top.gg/bot/") {
   DESERIALIZE(j, discriminator, std::string);
   DESERIALIZE(j, prefix, std::string);
@@ -131,7 +132,7 @@ bot::bot(const dpp::json& j)
 
   try {
     DESERIALIZE(j, invite, std::string);
-  } catch (TOPGG_UNUSED const std::exception&) {
+  } catch (const std::exception& TOPGG_UNUSED) {
     invite = "https://discord.com/oauth2/authorize?scope=bot&client_id=" + std::to_string(id);
   }
 
@@ -145,25 +146,25 @@ bot::bot(const dpp::json& j)
 
   try {
     DESERIALIZE(j, shard_count, size_t);
-  } catch (TOPGG_UNUSED const std::exception&) {
+  } catch (const std::exception& TOPGG_UNUSED) {
     shard_count = shards.size();
   }
 
   try {
     url.append(j["vanity"].template get<std::string>());
-  } catch (TOPGG_UNUSED const std::exception&) {
+  } catch (const std::exception& TOPGG_UNUSED) {
     url.append(std::to_string(id));
   }
 }
 
-stats::stats(const dpp::json& j) {
+TOPGG_API stats::stats(const dpp::json& j) {
   DESERIALIZE_PRIVATE_OPTIONAL(j, shard_count, size_t);
   DESERIALIZE_PRIVATE_OPTIONAL(j, server_count, size_t);
   DESERIALIZE_PRIVATE_OPTIONAL(j, shards, std::vector<size_t>);
   DESERIALIZE_PRIVATE_OPTIONAL(j, shard_id, size_t);
 }
 
-stats::stats(dpp::cluster& bot) {
+TOPGG_API stats::stats(dpp::cluster& bot) {
   std::vector<size_t> shards_server_count{};
   size_t servers{};
   
@@ -182,7 +183,7 @@ stats::stats(dpp::cluster& bot) {
   m_shard_count = std::optional{bot.numshards};
 }
 
-stats::stats(const std::vector<size_t>& shards, const size_t shard_index)
+TOPGG_API stats::stats(const std::vector<size_t>& shards, const size_t shard_index)
   : m_shards(std::optional{shards}), m_server_count(std::optional{std::reduce(shards.begin(), shards.end())}) {
   if (shard_index >= shards.size()) {
     throw std::out_of_range{"Shard index out of bounds from the given shards array."};
@@ -192,7 +193,7 @@ stats::stats(const std::vector<size_t>& shards, const size_t shard_index)
   m_shard_count = std::optional{shards.size()};
 }
 
-std::string stats::to_json() const {
+TOPGG_API std::string stats::to_json() const {
   dpp::json j;
 
   SERIALIZE_PRIVATE_OPTIONAL(j, shard_count);
@@ -203,15 +204,15 @@ std::string stats::to_json() const {
   return j.dump();
 }
 
-std::vector<size_t> stats::shards() const noexcept {
+TOPGG_API std::vector<size_t> stats::shards() const noexcept {
   return m_shards.value_or(std::vector<size_t>{});
 }
 
-size_t stats::shard_count() const noexcept {
+TOPGG_API size_t stats::shard_count() const noexcept {
   return m_shard_count.value_or(shards().size());
 }
 
-std::optional<size_t> stats::server_count() const noexcept {
+TOPGG_API std::optional<size_t> stats::server_count() const noexcept {
   if (m_server_count.has_value()) {
     return m_server_count;
   } else {
@@ -227,7 +228,7 @@ std::optional<size_t> stats::server_count() const noexcept {
   }
 }
 
-user_socials::user_socials(const dpp::json& j) {
+TOPGG_API user_socials::user_socials(const dpp::json& j) {
   DESERIALIZE_OPTIONAL_STRING(j, github);
   DESERIALIZE_OPTIONAL_STRING(j, instagram);
   DESERIALIZE_OPTIONAL_STRING(j, reddit);
@@ -235,7 +236,7 @@ user_socials::user_socials(const dpp::json& j) {
   DESERIALIZE_OPTIONAL_STRING(j, youtube);
 }
 
-user::user(const dpp::json& j)
+TOPGG_API user::user(const dpp::json& j)
   : account(j) {
   DESERIALIZE_OPTIONAL_STRING(j, bio);
   DESERIALIZE_OPTIONAL_STRING(j, banner);
@@ -249,4 +250,9 @@ user::user(const dpp::json& j)
   DESERIALIZE_ALIAS(j, mod, is_moderator, bool);
   DESERIALIZE_ALIAS(j, webMod, is_web_moderator, bool);
   DESERIALIZE_ALIAS(j, admin, is_admin, bool);
+}
+
+TOPGG_API voter::voter(const dpp::json& j)
+    : account(j) {
+    // No additional fields needed since voter only inherits from account
 }

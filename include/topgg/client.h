@@ -9,13 +9,7 @@
  */
 
 #pragma once
-
-#include <topgg/topgg.h>
-
-#include <functional>
-#include <vector>
-#include <string>
-#include <map>
+#include "topgg/export.h"
 
 namespace topgg {
   /**
@@ -87,7 +81,7 @@ namespace topgg {
    *
    * @since 2.0.0
    */
-  class TOPGG_EXPORT client {
+  class TOPGG_API client {
     std::multimap<std::string, std::string> m_headers;
     std::string m_token;
     dpp::cluster& m_cluster;
