@@ -60,26 +60,29 @@ using topgg::ratelimited;
 #pragma clang diagnostic pop
 #endif
 
-void internal_result::prepare() const {
-  if (m_response.error != dpp::h_success) {
-    throw m_response.error;
-  } else if (m_response.status >= 400) {
-    switch (m_response.status) {
-    case 401:
-      throw invalid_token{};
-
-    case 404:
-      throw not_found{};
-
-    case 429: {
-      const auto j = json::parse(m_response.body);
-      const auto retry_after = j["retry_after"].template get<uint16_t>();
-
-      throw ratelimited{retry_after};
-    }
-
-    default:
-      throw internal_server_error{};
+void internal_result::handle_response(const dpp::http_request_completion_t& response) {
+  if (response.error != dpp::h_success) {
+    throw response.error;
+  } else if (response.status >= 400) {
+    switch (response.status) {
+      case 401: {
+        throw invalid_token{};
+      }
+  
+      case 404: {
+        throw not_found{};
+      }
+  
+      case 429: {
+        const auto j{json::parse(response.body)};
+        const auto retry_after{j["retry_after"].template get<uint16_t>()};
+  
+        throw ratelimited{retry_after};
+      }
+  
+      default: {
+        throw internal_server_error{};
+      }
     }
   }
 }
