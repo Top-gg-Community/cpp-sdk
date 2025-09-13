@@ -13,11 +13,19 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(ENABLE_API "Build primary API support" ON)
+option(ENABLE_CPP_HTTPLIB_WEBHOOKS "Build support for webhooks via cpp-httplib" OFF)
+option(ENABLE_DROGON_WEBHOOKS "Build support for webhooks via drogon" OFF)
 option(ENABLE_CORO "Add support for C++20 coroutines" OFF)
 option(TESTING "Enable this only if you are testing the library" OFF)
 
 if(ENABLE_API)
 file(GLOB TOPGG_SOURCE_FILES src/*.cpp)
+endif()
+
+if(ENABLE_CPP_HTTPLIB_WEBHOOKS)
+set(TOPGG_SOURCE_FILES ${TOPGG_SOURCE_FILES} src/webhooks/cpp-httplib.cpp src/webhooks/models.cpp)
+elseif(ENABLE_DROGON_WEBHOOKS)
+set(TOPGG_SOURCE_FILES ${TOPGG_SOURCE_FILES} src/webhooks/drogon.cpp src/webhooks/models.cpp)
 endif()
 
 if(BUILD_SHARED_LIBS)
@@ -57,6 +65,65 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(DPP REQUIRED)
 endif()
 
+if(ENABLE_CPP_HTTPLIB_WEBHOOKS)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-httplib/cpp-httplib.h")
+execute_process(COMMAND git clone https://github.com/yhirose/cpp-httplib.git --depth 1 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-httplib")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-httplib")
+endif()
+file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/cpp-httplib/httplib.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-httplib/cpp-httplib.h")
+file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/cpp-httplib")
+endif()
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/nlohmann/json.hpp")
+execute_process(COMMAND git clone https://github.com/nlohmann/json.git --depth 1 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/nlohmann")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/nlohmann")
+endif()
+file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/json/single_include/nlohmann/json.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/nlohmann/json.hpp")
+file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/json")
+endif()
+endif()
+
+if(ENABLE_DROGON_WEBHOOKS)
+if(WIN32)
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/conan_toolchain.cmake")
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/conan_toolchain.cmake)
+endif()
+
+set(DROGON_LIBRARY drogon)
+
+set(
+  TRANTOR_INCLUDE_DIR
+  "${CMAKE_CURRENT_SOURCE_DIR}/deps/drogon/trantor"
+  "${CMAKE_BINARY_DIR}/deps/drogon/trantor/exports"
+)
+
+set(
+  DROGON_INCLUDE_DIR
+  "${CMAKE_CURRENT_SOURCE_DIR}/deps/drogon/lib/inc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/deps/drogon/orm_lib/inc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/deps/drogon/nosql_lib/redis/inc"
+  "${CMAKE_BINARY_DIR}/deps/drogon/exports"
+)
+
+set(BUILD_CTL OFF)
+set(BUILD_EXAMPLES OFF)
+set(BUILD_BROTLI OFF)
+set(BUILD_YAML_CONFIG OFF)
+set(USE_SUBMODULE ON)
+
+add_subdirectory(deps/drogon)
+
+target_compile_definitions(topgg PUBLIC __TOPGG_DROGON_WEBHOOKS__)
+
+if(WIN32)
+target_compile_definitions(topgg PRIVATE _CRT_SECURE_NO_WARNINGS)
+cmake_policy(SET CMP0091 NEW)
+endif()
+endif()
+
 target_compile_definitions(topgg PRIVATE __TOPGG_BUILDING__)
 
 if(MSVC)
@@ -68,6 +135,10 @@ endif()
 target_include_directories(topgg PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${DPP_INCLUDE_DIR}
+  ${JSONCPP_INCLUDE_DIRS}
+  ${ZLIB_INCLUDE_DIR}
+  ${TRANTOR_INCLUDE_DIR}
+  ${DROGON_INCLUDE_DIR}
 )
 
-target_link_libraries(topgg PUBLIC ${DPP_LIBRARIES})
+target_link_libraries(topgg PUBLIC ${DPP_LIBRARIES} ${JSONCPP_LIBRARIES} ${DROGON_LIBRARY})
